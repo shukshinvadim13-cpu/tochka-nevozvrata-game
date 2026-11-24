@@ -63,7 +63,7 @@ button:active{background:#2a313b}
 <div id="toast"></div>
 <div id="dlg" hidden><div id="dw"></div><div id="dt"></div><div id="dc"></div></div>
 <div id="phone" hidden><div class="card"><b>Телефон</b><div id="ph"></div><div id="pst"></div><button id="help" hidden>Написать Кире правду и попросить помощи</button><button id="pclose">Закрыть</button></div></div>
-<div id="menu" hidden><div class="card"><b>Пауза</b><button id="mres">Продолжить</button><button id="msave">Сохранить</button><button id="mw">Погода: авто</button><button id="mnew">Начать заново</button></div></div>
+<div id="menu" hidden><div class="card"><b>Пауза</b><button id="mres">Продолжить</button><button id="msave">Сохранить</button><button id="munst">Я застрял / вернуть на место</button><button id="mq">Графика</button><button id="mw">Погода: авто</button><button id="mnew">Начать заново</button></div></div>
 <div id="start"><div class="card" style="background:none;border:0;text-align:center;justify-items:center;gap:14px"><h1>Точка невозврата</h1><div style="color:var(--acc)">Глава 1 · Обычный день</div><p>Сургут, ноябрь. Игра о одиночестве, любви и последствиях решений. Затрагивает тему зависимости и не романтизирует её. 18+</p><button id="go" style="background:var(--acc);color:#111;font-weight:600;padding:12px 28px">Играть</button><button id="newg" hidden>Новая игра</button><p class="hint">WASD — движение · мышь — камера · Shift — бег · E — действие · P — телефон · Esc — пауза</p></div></div>
 <div id="fade"></div>
 <div id="ctl"><div id="zone"><i id="base"><i id="knob"></i></i></div><button class="b" id="bE">Действие</button><button class="b" id="bR">Бег</button><button class="b" id="bP">📱</button></div>
@@ -80,8 +80,10 @@ let S;try{S=Object.assign(def(),JSON.parse(localStorage.getItem(K)))}catch(e){S=
 const hadSave=!!localStorage.getItem(K)&&S.step>0;
 const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
 /* ===== three ===== */
-const cvs=$('c'),R=new THREE.WebGLRenderer({canvas:cvs,antialias:true,powerPreference:'high-performance'});
-R.setPixelRatio(Math.min(devicePixelRatio,2));R.outputEncoding=THREE.sRGBEncoding;R.toneMapping=THREE.ACESFilmicToneMapping;R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
+const QL={high:{n:'Высокая',pr:2,sh:2048,snow:2500,far:500,aa:1},medium:{n:'Средняя',pr:1.5,sh:1024,snow:1400,far:350,aa:1},low:{n:'Низкая',pr:1,sh:0,snow:500,far:220,aa:0}};
+let QK=localStorage.getItem('tn_q')||(/iPhone|iPad/.test(navigator.userAgent)?'medium':'high');if(!QL[QK])QK='medium';let QS=QL[QK];
+const cvs=$('c'),R=new THREE.WebGLRenderer({canvas:cvs,antialias:!!QS.aa,powerPreference:'high-performance'});
+R.setPixelRatio(Math.min(devicePixelRatio,QS.pr));R.outputEncoding=THREE.sRGBEncoding;R.toneMapping=THREE.ACESFilmicToneMapping;R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
 const scene=new THREE.Scene(),fog=new THREE.FogExp2(0x888888,.02);scene.fog=fog;scene.background=new THREE.Color(0x888888);
 const cam=new THREE.PerspectiveCamera(60,1,.1,500);
 const hemi=new THREE.HemisphereLight(0xaab8d0,0x30343a,.6),sun=new THREE.DirectionalLight(0xffffff,1);
@@ -183,7 +185,48 @@ load('models/building.glb',m=>{(window.__M||[]).forEach(([x,z,w,d,h],i)=>{const 
 load('models/tree.glb',m=>{const tp=window.__T||[];if(!tp.length)return;if(window.__TM)window.__TM.visible=false;const b=new THREE.Box3().setFromObject(m),h=b.getSize(new V()).y||1;tp.forEach(a=>{const o=m.clone(true),k=(7+Math.random()*4)/h;o.scale.setScalar(k);const g=base(o);g.position.set(a[0],0,a[1]);g.rotation.y=Math.random()*6.28;scene.add(g)})});
 /* скамейки: models/bench.glb во дворе */
 load('models/bench.glb',m=>{[[-20,6,0],[-40,6,0],[-30,-24,Math.PI],[10,-20,Math.PI/2]].forEach(a=>{const o=m.clone(true),b=new THREE.Box3().setFromObject(o),h=b.getSize(new V()).y||1;o.scale.setScalar(1/h*1);const g=base(o);g.position.set(a[0],0,a[1]);g.rotation.y=a[2];scene.add(g)})})})();
-/* ===== люди ===== */
+/* ===== благоустройство двора ===== */
+(()=>{const snow=MS(0xeef3f8,1),sn=(x,y,z,w,d)=>box(x,y,z,w,.08,d,snow,false);const cl=[0xc4423a,0x2f6fb0,0xe0b020,0x3a9a5a];
+/* сугробы вдоль дороги */
+[38.2,49.8].forEach(z=>{const b=new THREE.Mesh(new THREE.CylinderGeometry(.7,.9,400,12),snow);b.rotation.z=Math.PI/2;b.scale.set(1,1,.55);b.position.set(0,.2,z);b.receiveShadow=true;scene.add(b)});
+/* протоптанные дорожки */
+const pc=cv(128,128,(g,w,h)=>{g.fillStyle='#aab2ba';g.fillRect(0,0,w,h);spk(g,w,h,1200,['#fff','#7c858e','#c9d0d6'])}),pm2=new THREE.MeshStandardMaterial({map:tex(pc,1,8),roughness:.7});
+const trail=(x1,z1,x2,z2,w)=>{const L=Math.hypot(x2-x1,z2-z1),m=new THREE.Mesh(new THREE.PlaneGeometry(w,L),pm2);m.rotation.x=-Math.PI/2;m.rotation.z=Math.atan2(x2-x1,z2-z1)*-1+0;m.rotation.order='YXZ';m.rotation.set(-Math.PI/2,0,0);const g=new THREE.Group();g.add(m);g.rotation.y=Math.atan2(x2-x1,z2-z1);g.position.set((x1+x2)/2,.045,(z1+z2)/2);m.receiveShadow=true;scene.add(g)};
+trail(-30,22,24,12,1.8);trail(-30,26,5,32,1.6);trail(-30,24,-56,22,1.6);trail(-30,32,-62,66,1.4);
+/* подъезд: ступени, табличка, фонарь, домофон */
+box(-30,.08,-1.6,2.6,.16,1.2,MS(0x777b80,.9),false);box(-30,.2,-2.1,2.2,.16,.7,MS(0x777b80,.9),false);
+const sgn=new THREE.Mesh(new THREE.PlaneGeometry(1,.4),new THREE.MeshBasicMaterial({map:tex(signC('ПОДЪЕЗД 1',256,100,44,'#2a3a52','#fff'),1,1)}));sgn.position.set(-30,3.2,-2.88);scene.add(sgn);
+box(-28.7,1.4,-2.86,.16,.3,.05,MS(0x222),false);box(-28.7,1.4,-2.83,.1,.2,.02,new THREE.MeshBasicMaterial({color:0x7be0ff}),false);
+const lan=box(-30,2.55,-2.6,.4,.12,.3,new THREE.MeshBasicMaterial({color:0xffd9a0}),false);const gs=new THREE.Sprite(new THREE.SpriteMaterial({map:glowT,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:.7}));gs.scale.set(5,5,1);gs.position.set(-30,2.5,-2.5);scene.add(gs);glows.push(gs);
+/* скамейки */
+const bench=(x,z,ry)=>{const g=new THREE.Group(),wd=MS(0x7a5535,.8),mt=MS(0x2a2d31,.5,.6);for(let i=0;i<3;i++){const p=new THREE.Mesh(new THREE.BoxGeometry(1.6,.05,.13),wd);p.position.set(0,.46,-.18+i*.15);g.add(p)}
+for(let i=0;i<2;i++){const p=new THREE.Mesh(new THREE.BoxGeometry(1.6,.05,.12),wd);p.position.set(0,.72+i*.15,-.28);p.rotation.x=-.15;g.add(p)}
+[-.7,.7].forEach(x=>{const l=new THREE.Mesh(new THREE.BoxGeometry(.06,.46,.5),mt);l.position.set(x,.23,0);g.add(l)});const sc=new THREE.Mesh(new THREE.BoxGeometry(1.5,.07,.4),snow);sc.position.set(0,.51,0);g.add(sc);
+g.traverse(o=>{o.castShadow=true});g.position.set(x,0,z);g.rotation.y=ry;scene.add(g);addBox(CO,x,z,1.6,.6,.6)};
+bench(-35,1.4,Math.PI);bench(-25,1.4,Math.PI);bench(-46,30,0);bench(-58,30,0);bench(9,36,Math.PI);
+/* детская площадка */
+const px=-52,pz=22,rd=MS(0xc4423a,.5,.3),bl=MS(0x2f6fb0,.5,.3),yl=MS(0xe0b020,.5,.3);
+box(px,.04,pz,14,.06,12,new THREE.MeshStandardMaterial({color:0xcfd6dc,roughness:1}),false);
+[-1.6,1.6].forEach(dx=>{[-.8,.8].forEach(dz=>{const l=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,2.8,8),rd);l.position.set(px+dx*1.3+dz*.15,1.35,pz-3+dz*.8);l.rotation.x=dz*.25;scene.add(l)})});
+box(px,2.7,pz-3,3.6,.1,.1,rd,false);sn(px,2.78,pz-3,3.7,.2);
+[-.8,.8].forEach(dx=>{[0,1].forEach(k=>{const c=new THREE.Mesh(new THREE.CylinderGeometry(.01,.01,2.2,4),MS(0x333));c.position.set(px+dx+(k?.05:-.05),1.6,pz-3);scene.add(c)});box(px+dx,.52,pz-3,.4,.05,.2,bl,false)});
+const sl=new THREE.Mesh(new THREE.BoxGeometry(.9,.06,3.2),yl);sl.position.set(px+5,1.0,pz+1);sl.rotation.x=.55;sl.castShadow=true;scene.add(sl);box(px+5,1.2,pz-.9,1,.1,.9,bl,true);[-.5,.5].forEach(x=>box(px+5+x,.6,pz-.9,.08,1.2,.08,rd,false));
+[-.5,.5].forEach(x=>{const w=new THREE.Mesh(new THREE.BoxGeometry(.06,.3,3.2),yl);w.position.set(px+5+x,1.1,pz+1);w.rotation.x=.55;scene.add(w)});addBox(CO,px+5,pz,1.2,3.4,1.4);
+[[0,-.5],[.0,-.1]].forEach(()=>0);
+const sb=[[-1,-1],[1,-1],[-1,1],[1,1]];box(px-4,.12,pz+3,3,.24,.1,MS(0x7a5535),false);box(px-4,.12,pz+4.9,3,.24,.1,MS(0x7a5535),false);box(px-5.45,.12,pz+3.95,.1,.24,2,MS(0x7a5535),false);box(px-2.55,.12,pz+3.95,.1,.24,2,MS(0x7a5535),false);sn(px-4,.2,pz+3.95,2.8,1.8);
+/* снеговик */
+const sm=(y,r,x,z)=>{const m=new THREE.Mesh(new THREE.SphereGeometry(r,16,12),snow);m.position.set(x,y,z);m.castShadow=true;scene.add(m)};sm(.45,.45,-38,14);sm(1.1,.34,-38,14);sm(1.6,.25,-38,14);
+const cr=new THREE.Mesh(new THREE.ConeGeometry(.04,.25,6),MS(0xe07a20));cr.rotation.x=Math.PI/2;cr.position.set(-38,1.6,14.28);scene.add(cr);addBox(CO,-38,14,.9,.9,1.8);
+/* мусорные баки */
+[[-6,3],[-3.6,3]].forEach(([x,z],i)=>{box(x,.65,z,2,1.3,1.2,MS(i?0x2f5a8a:0x3a6a42,.6,.3),true,1);box(x,1.35,z,2.1,.1,1.3,MS(0x222,.8),false);sn(x,1.43,z,2,1.1)});
+/* машины с шапками снега */
+const car=(x,z,c)=>{box(x,.7,z,4.3,.8,1.9,MS(c,.3,.5),true,1);box(x,1.35,z,2.3,.6,1.7,MS(0x20262c,.15,.6));sn(x,1.68,z,2.2,1.6);sn(x,1.12,z-.0,4,1.7);
+[[-1.4,-.9],[1.4,-.9],[-1.4,.9],[1.4,.9]].forEach(([a,b])=>{const w=new THREE.Mesh(new THREE.CylinderGeometry(.36,.36,.25,14),MS(0x111,.9));w.rotation.x=Math.PI/2;w.position.set(x+a,.36,z+b);scene.add(w)});
+[-.65,.65].forEach(b=>box(x+2.16,.8,z+b,.05,.16,.32,new THREE.MeshBasicMaterial({color:0xfff0c0}),false))};
+car(-20,26,0x2d3a4a);car(-14.5,26,0xbfc3c7);car(-9,26,0x7a1f1f);car(-3.5,26,0x1d1d20);
+lamp(-52,14,1.5);lamp(-14,22,1.5);lamp(-30,-0.5,1.5);
+})();
+/* ===== люди =====
 function person(o){const g=new THREE.Group(),M=(c,r)=>new THREE.MeshStandardMaterial({color:c,roughness:r||.9});const sk=M(o.skin,.55),tp=M(o.top,.92),lg=M(o.leg,.85),sh=M(o.shoe,.5),hr=M(o.hair,.9),ey=M(0x15110f,.4);
 const S=(geo,m,x,y,z,p,sx,sy,sz)=>{const b=new THREE.Mesh(geo,m);b.position.set(x,y,z);if(sx)b.scale.set(sx,sy,sz);b.castShadow=true;(p||g).add(b);return b};
 const cy=(a,b,h)=>new THREE.CylinderGeometry(a,b,h,16),sp=r=>new THREE.SphereGeometry(r,18,14);
@@ -200,6 +243,20 @@ let anim=(g,ph,a)=>{const u=g.userData;u.L[0].rotation.x=Math.sin(ph)*a;u.L[1].r
 const pl=person({top:0x121316,leg:0x1c1f24,skin:0xd9a98a,hair:0x1c1511,shoe:0x2b2b2d});
 const kira=person({top:0x3f5a50,leg:0x23262c,skin:0xe8b99c,hair:0x6b4a2f,shoe:0xdddddd,long:1});kira.position.set(5,0,35.4);
 const artem=person({top:0x575c63,leg:0x2a3a52,skin:0xd2a283,hair:0x151515,shoe:0x777777});artem.position.set(-62,0,70);artem.rotation.y=Math.PI;
+/* ===== Кира: одежда, причёска, лицо ===== */
+(function(g){const M=(c,r)=>new THREE.MeshStandardMaterial({color:c,roughness:r||.9}),sp=r=>new THREE.SphereGeometry(r,18,14),cy=(a,b,h)=>new THREE.CylinderGeometry(a,b,h,22);
+const add=(geo,m,x,y,z,sx,sy,sz,p)=>{const b=new THREE.Mesh(geo,m);b.position.set(x,y,z);if(sx)b.scale.set(sx,sy,sz);b.castShadow=true;(p||g).add(b);return b};
+const coat=M(0x9c7a56,.95),sc=M(0x8a2a30,1),wool=M(0xe8e0d0,1),boot=M(0x2a1c16,.6),hair=M(0x5e3f26,.8),wh=M(0xf4f4f0,.3),ir=M(0x3a2a1c,.3),lip=M(0xb85a62,.5),br=M(0x3b2a1c,.9),gl=M(0x1e1e22,.8);
+add(cy(.235,.22,.66),coat,0,1.2,0,1.18,1,.7);add(sp(.27),coat,0,1.5,0,1.1,.5,.76);add(cy(.22,.36,.62),coat,0,.78,0,1.12,1,.8);
+g.userData.A.forEach(a=>{add(cy(.078,.066,.56),coat,0,-.3,0,1,1,1,a);add(sp(.058),gl,0,-.64,0,1,1.1,.9,a)});
+g.userData.L.forEach(l=>{add(cy(.092,.08,.4),boot,0,-.72,0,1,1,1,l);add(sp(.09),boot,0,-.89,.06,1,.62,1.85,l)});
+const t=add(new THREE.TorusGeometry(.115,.045,10,20),sc,0,1.6,.01,1.1,1,1);t.rotation.x=Math.PI/2;add(new THREE.BoxGeometry(.1,.4,.04),sc,.09,1.42,.17);
+const h=add(new THREE.SphereGeometry(.15,20,14,0,Math.PI*2,0,Math.PI*.52),wool,0,1.755,-.005,1.05,1.12,1.12);add(sp(.045),wool,0,1.935,-.01);
+const rm=add(new THREE.TorusGeometry(.14,.025,8,22),wool,0,1.775,0,1.04,1,1.1);rm.rotation.x=Math.PI/2;
+add(sp(.14),hair,0,1.5,-.11,1,3.4,.62);[-1,1].forEach(x=>{add(sp(.05),hair,x*.125,1.66,.0,.5,2.4,.9);
+add(sp(.021),wh,x*.045,1.76,.128,1.3,.85,.5);add(sp(.0115),ir,x*.045,1.76,.139);add(new THREE.BoxGeometry(.04,.007,.01),br,x*.046,1.795,.13).rotation.z=x*.12});
+add(sp(.02),lip,0,1.7,.131,1.7,.5,.6);
+})(kira);
 /* ===== герой: модель и анимация «Strut Walking» из hero.glb (если файла нет — остаётся простая фигура) ===== */
 let heroMix=null,heroAct=null,heroGo=0,heroTs=1;
 function heroTick(dt){if(!heroMix)return;const h=heroAct.getClip().duration/2,p0=heroAct.time%h;if(!heroGo&&heroAct.paused&&p0<.12)return;
@@ -264,11 +321,13 @@ const wc=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,.05,24),MS(0xd8d0bc,.
 })()}catch(e){console.warn('интерьер',e)}
 
 /* ===== погода и частицы ===== */
-const NP=1400,pp=new Float32Array(NP*3);for(let i=0;i<NP;i++){pp[i*3]=Math.random()*60-30;pp[i*3+1]=Math.random()*25;pp[i*3+2]=Math.random()*60-30}
+const NP=2500,pp=new Float32Array(NP*3);for(let i=0;i<NP;i++){pp[i*3]=Math.random()*60-30;pp[i*3+1]=Math.random()*25;pp[i*3+2]=Math.random()*60-30}
 const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(pp,3));
 const dotT=new THREE.CanvasTexture(cv(32,32,(g)=>{const r=g.createRadialGradient(16,16,0,16,16,16);r.addColorStop(0,'#fff');r.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=r;g.fillRect(0,0,32,32)}));
 const pm=new THREE.PointsMaterial({size:.14,map:dotT,transparent:true,depthWrite:false,opacity:.9}),pts=new THREE.Points(pg,pm);pts.frustumCulled=false;scene.add(pts);
-const W={t:'snow',lock:null,tm:150};
+const W={t:'snow',lock:null,tm:150};let QN=QS.snow;
+function applyQ(){R.setPixelRatio(Math.min(devicePixelRatio,QS.pr));R.shadowMap.enabled=QS.sh>0;sun.castShadow=QS.sh>0;if(QS.sh){sun.shadow.mapSize.set(QS.sh,QS.sh);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null}}
+QN=QS.snow;pg.setDrawRange(0,QN);cam.far=QS.far;cam.updateProjectionMatrix();scene.traverse(o=>{if(o.material)o.material.needsUpdate=true});resize()}
 const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,40,8),new THREE.MeshBasicMaterial({color:0xe0a458,transparent:true,opacity:.35,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));beacon.position.y=20;scene.add(beacon);
 /* ===== звук ===== */
 let AC,lp;
@@ -277,7 +336,7 @@ function beep(){if(!AC)return;const o=AC.createOscillator(),g=AC.createGain();o.
 /* ===== игровая логика ===== */
 let busy=false,paused=true,started=false,yaw=S.yaw||0,pitch=.35,jx=0,jy=0,runT=false,ph=0;
 const P=new THREE.Vector3(S.x,0,S.z),keys={};
-const OBJ=['Проверь телефон (📱 или P)','Выйди из квартиры','Купи еду в магазине','Встреться с Кирой на остановке','Найди Артёма у гаражей','Вернись домой и ляг спать','Глава 2 · Поговори с Кирой на остановке','Глава 2 · Найди Артёма у гаражей','Глава 2 · Вернись домой и ляг спать','Свободная прогулка. Продолжение следует'];
+const OBJ=['Проверь телефон (📱 или P)','Выйди из квартиры','Купи еду в магазине','Встреться с Кирой на остановке','Найди Артёма у гаражей','Вернись домой и ляг спать','Глава 2 · Поговори с Кирой на остановке','Глава 2 · Найди Артёма у гаражей','Глава 2 · Вернись домой и ляг спать','Глава 3 · Утро. Найди нужного человека','Глава 3 · Вернись домой и ляг спать','Свободная прогулка. Продолжение следует'];
 const hh=()=>(S.min/60)%24,pad=n=>String(Math.floor(n)).padStart(2,'0'),clk=()=>pad(hh())+':'+pad(S.min%60);
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>e.classList.remove('on'),4000)}
 function msg(f,t,quiet){S.msgs.unshift({f,t,h:clk()});if(!quiet){toast(f+': '+t);beep();$('bP').classList.add('dot')}}
@@ -285,7 +344,7 @@ function ask(w,t,ch){return new Promise(res=>{$('dw').textContent=w;const e=$('d
 async function run(fn){if(busy)return;busy=true;try{await fn()}finally{busy=false;save()}}
 async function fade(txt,fn){const f=$('fade');f.textContent=txt||'';f.style.opacity=1;await wait(900);fn&&fn();await wait(900);f.style.opacity=0;f.textContent=''}
 const chg=o=>{for(const k in o)S[k]=k=='money'?S[k]+o[k]:clamp(S[k]+o[k],0,100)};
-function go(i){return fade('',()=>{S.in=i;if(i){P.set(2,0,-299.3);yaw=Math.PI}else{P.set(-30,0,-1.2);yaw=0}})}
+function go(i){return fade('',()=>{S.in=i;if(i){P.set(1.4,0,-299.4);yaw=0}else{P.set(-30,0,-1.2);yaw=0}})}
 const hrs=m=>{const e=Math.floor(m/60);return m};
 async function buy(){if(S.money<150){await ask('','Денег не хватает. Нужно хотя бы 150 ₽.');return}
 S.money-=150;chg({sat:40,str:-3});await ask('','Хлеб, сосиски, пачка чая. Ничего особенного, но хотя бы не пусто в желудке.');
@@ -293,12 +352,12 @@ if(S.step==2){S.step=3;msg('Кира','Я на остановке у твоег�
 async function work(){if(S.en<20){await ask('','Нет сил. Ноги едва держат.');return}
 await fade('Две смены на кассе пролетели как один длинный день…',()=>{S.min+=120;S.money+=350;chg({en:-20,sat:-10,str:4,rep:2})})}
 async function fridge(){await ask('','Холодильник почти пустой. На дверце записка: «Мы на смене. Не жди». Ты давно перестал ждать.');if(!S.f.note){S.f.note=1;S.money+=200;toast('Под запиской лежит 200 ₽')}}
-async function sleepAct(){const h=hh();if(S.en>80&&h>=7&&h<21&&S.step!=8){await ask('','Спать не хочется.');return}
+async function sleepAct(){const h=hh();if(S.en>80&&h>=7&&h<21&&S.step!=8&&S.step!=10){await ask('','Спать не хочется.');return}
 const bad=S.add>20;await fade('Ты проваливаешься в сон…',()=>{const m=S.min%1440;S.min=S.min-m+(m<420?420:1860);chg({en:bad?40:75,str:bad?8:-12,sat:-20})});
 if(bad)await ask('','Сон был рваным. Тело ломит, мысли возвращаются к одному и тому же.');
 if(S.step==5){await ask('',S.f.acc?'Ты лёг, но тревога не отпускала. Ты знаешь, чего тебе хочется, и это пугает.':S.f.callK?'Ты уснул с мыслью, что кому-то всё-таки не всё равно.':'Ты впервые за долгое время уснул без тяжести.');
 await ask('',S.trust>=55?'Кира ещё ответит тебе. Может быть.':'Кира всё реже отвечает. Между вами что-то треснуло.');
-await ask('','Конец главы 1. Твои решения сохранены и повлияют на историю дальше.');S.step=6;msg('Кира','Доброе утро. Если захочешь поговорить — я у остановки.');toast('Глава 2 · «Эхо»')}if(S.step==8)await ending2()}
+await ask('','Конец главы 1. Твои решения сохранены и повлияют на историю дальше.');S.step=6;msg('Кира','Доброе утро. Если захочешь поговорить — я у остановки.');toast('Глава 2 · «Эхо»')}if(S.step==8)await ending2();if(S.step==10)await ending3()}
 async function talkKira(){
 await ask('Кира','Ты пропал на два дня. Я писала. Ты хоть читал?');
 let c=await ask('Вадим','Что ответить?',['Телефон сел. Прости, правда.','Ты тоже не рвалась звонить.','Пожать плечами и промолчать.']);
@@ -352,11 +411,32 @@ if(bad)await ask('Неизвестный номер','«Свёрток был н
 else if(good)await ask('Кира','Завтра приходи к бабушке. Она хочет с тобой познакомиться. По-настоящему.');
 else await ask('Кира',S.trust<45?'Мне нужно время подумать. Не пиши пока.':'Спокойной ночи. Береги себя.');
 await ask('',bad?'Конец главы 2. Ты перешёл черту, которую нельзя пройти назад. Продолжение: «Глава 3 · Долг».':good?'Конец главы 2. Рядом с тобой есть человек, который тебя ждёт. Продолжение: «Глава 3 · Дом».':'Конец главы 2. Между «хорошо» и «плохо» остаётся много серого. Продолжение: «Глава 3 · Выбор».');
-S.step=9}
+S.f.route=bad?'bad':good?'good':'mid';S.step=9;toast('Глава 3 · '+(bad?'«Долг»':good?'«Дом»':'«Выбор»'))}
+async function talkKira3(){let c;const rt=S.f.route;
+if(rt=='good'){await ask('Кира','Бабушка ждёт нас с пирогом. Но сначала скажу главное: в городе есть центр, где помогают с зависимостью. Анонимно, бесплатно. Я узнала.');
+c=await ask('Вадим','Она смотрит без упрёка. Только с надеждой.',['«Давай сходим вместе. Я устал так жить».','«Я не готов. Но я рядом с тобой».','«Справлюсь сам».']);
+if(c==0){S.f.center=1;chg({trust:10,str:-12,add:-12,rep:3});await ask('Кира','Я пойду с тобой. Каждый раз. Обещаю.')}else if(c==1){chg({trust:3,str:-4});await ask('Кира','Хорошо. Дверь будет открыта, когда решишься.')}else{chg({trust:-6,str:5});await ask('Кира','Сам — это как? Как до этого?..')}
+await ask('Бабушка','Садись, Вадик, чай остынет. Кира говорит, ты хороший мальчик, просто потерялся. Все теряются. Главное — вовремя выйти на дорогу.');
+await ask('','В маленькой кухне пахнет яблоками и лекарствами. Впервые за долгое время тебе тепло по-настоящему.')}
+else if(rt=='mid'){await ask('Кира','Я должна спросить прямо: ты со мной или с тем, что тянет тебя назад?');
+c=await ask('Вадим','Простого ответа нет.',['«С тобой. Помоги мне, пожалуйста».','«Я сам не знаю».','«Не лезь, я разберусь».']);
+if(c==0){S.f.center=1;chg({trust:9,str:-8,add:-8});await ask('Кира','Тогда начнём с малого: сегодня ты ночуешь дома и не берёшь трубку у Артёма.')}else if(c==1){chg({trust:1,str:2});await ask('Кира','Честно. Это лучше, чем ложь. Подумай, ладно?')}else{chg({trust:-9,str:7});await ask('Кира','Хорошо. Только потом не говори, что я не предлагала.')}}
+kira.visible=false;S.step=10;msg('Кира',S.f.center?'Я записала нас на пятницу. Не передумай.':'Просто помни: я рядом.');}
+async function talkBad3(){let c;await ask('Незнакомец','Свёрток, что ты отнёс, оказался пустой. Либо деньги, либо работа. Три тысячи сейчас — и забудем.');
+c=await ask('Вадим','Ладони мокрые. Артём отводит глаза.',['Отдать 3000 ₽.','Сказать: «Я больше не работаю на вас».','Согласиться на ещё одну доставку.']);
+if(c==0&&S.money>=3000){S.money-=3000;chg({str:6,rep:-2});S.f.paid=1;await ask('Незнакомец','Умный мальчик. Номер сотри.')}
+else if(c==0){chg({str:10});await ask('Незнакомец','Нет денег? Тогда у тебя есть до завтра. Подумай.')}
+else if(c==1){chg({rep:4,str:10,trust:3});S.f.out=1;await ask('Незнакомец','Смелый. Посмотрим, надолго ли.');await ask('','Ты уходишь, и каждый шаг по снегу отдаётся в висках. Но впервые ты сказал это вслух.')}
+else{S.f.deep=1;S.money+=4000;chg({rep:-12,str:15,add:5,trust:-8});await ask('Незнакомец','Вот это разговор. Адрес пришлю.')}
+S.step=10;msg('Кира',S.f.deep?'Ты не отвечаешь два часа. Что происходит?':'Ты в порядке? Напиши мне.')}
+async function ending3(){await ask('',S.f.center?'Перед сном ты открываешь календарь и ставишь пометку: «пятница, центр». Рука не дрожит.':S.f.deep?'Ты лежишь в темноте. Телефон на тумбочке то и дело вспыхивает. Ты не берёшь трубку.':'Ты лежишь и считаешь трещины на потолке. Завтра будет ещё один день.');
+await ask('',S.f.deep?'Конец главы 3. Дорога назад становится всё уже. Продолжение: «Глава 4».':S.f.center?'Конец главы 3. У тебя есть план и человек, который идёт рядом. Продолжение: «Глава 4».':'Конец главы 3. Решения впереди. Продолжение: «Глава 4».');S.step=11}
 const IA=[
+{in:0,x:5,z:35,r:2.6,l:()=>'Поговорить с Кирой',ok:()=>S.step==9&&S.f.route!='bad',fn:talkKira3},
+{in:0,x:-62,z:67.8,r:2.6,l:()=>'Поговорить с Артёмом',ok:()=>S.step==9&&S.f.route=='bad',fn:talkBad3},
 {in:0,x:5,z:35,r:2.6,l:()=>'Поговорить с Кирой',ok:()=>S.step==6,fn:talkKira2},
 {in:0,x:-62,z:67.8,r:2.6,l:()=>'Поговорить с Артёмом',ok:()=>S.step==7,fn:talkArtem2},
-{in:1,x:2.4,z:-298.2,r:1.8,l:()=>'Выйти из квартиры',fn:async()=>{await go(0);if(S.step==1){S.step=2}}},
+{in:1,x:2.4,z:-298.2,r:2.6,l:()=>'Выйти из квартиры',fn:async()=>{await go(0);if(S.step==1){S.step=2}}},
 {in:1,x:-2.2,z:-301.2,r:2.2,l:()=>'Лечь спать',fn:sleepAct},
 {in:1,x:3,z:-301.6,r:1.6,l:()=>'Холодильник',fn:fridge},
 {in:0,x:-30,z:-2.3,r:2.4,l:()=>'Войти домой',fn:()=>go(1)},
@@ -366,7 +446,7 @@ const IA=[
 {in:0,x:-62,z:67.8,r:2.6,l:()=>'Поговорить с Артёмом',ok:()=>S.step==4,fn:talkArtem}];
 const near=()=>{let b=null,bd=1e9;for(const a of IA){if(!!a.in!=!!S.in||(a.ok&&!a.ok()))continue;const d=Math.hypot(P.x-a.x,P.z-a.z);if(d<a.r&&d<bd){b=a;bd=d}}return b};
 const act=()=>{if(busy||paused)return;const a=near();if(a)run(a.fn)};
-function tgt(){const s=S.step,d=[2.4,-298.2];if(s<1)return null;if(s==1)return S.in?d:null;if(s==5||s==8)return S.in?[-2.2,-301.2]:[-30,-2.3];if(S.in)return d;return s==2?[25,8.2]:s==3||s==6?[5,35]:s==4||s==7?[-62,67.8]:null}
+function tgt(){const s=S.step,d=[2.4,-298.2];if(s<1)return null;if(s==1)return S.in?d:null;if(s==5||s==8||s==10)return S.in?[-2.2,-301.2]:[-30,-2.3];if(S.in)return d;return s==2?[25,8.2]:s==3||s==6||(s==9&&S.f.route!='bad')?[5,35]:s==4||s==7||(s==9&&S.f.route=='bad')?[-62,67.8]:null}
 /* ===== телефон / меню ===== */
 function openPhone(){if(busy||paused)return;$('bP').classList.remove('dot');paused=true;$('ph').innerHTML=S.msgs.map(m=>`<div class="msg"><b>${m.f}</b><small>${m.h}</small><br>${m.t}</div>`).join('');
 const st=(n,v)=>`<div class="st">${n}<i><b style="width:${v}%"></b></i></div>`;$('pst').innerHTML=st('Доверие Киры',S.trust)+st('Репутация',S.rep)+st('Зависимость',S.add)+`<div class="st">Деньги<span>${S.money} ₽</span></div>`;
@@ -375,6 +455,8 @@ $('pclose').onclick=()=>{$('phone').hidden=true;paused=false};
 $('help').onclick=()=>{chg({add:-10,str:-6,trust:S.f.lied?-2:5});msg('Кира','Спасибо, что сказал. Давай справимся вместе. Я приду завтра.',1);toast('Ты рассказал правду. Стало чуть легче.');$('pclose').onclick();save()};
 function menu(on){if(!started||busy&&on)return;paused=on;$('menu').hidden=!on;if(on&&document.pointerLockElement)document.exitPointerLock();save()}
 $('mres').onclick=()=>menu(false);$('msave').onclick=()=>{save();toast('Сохранено')};$('bM').onclick=()=>menu(true);
+$('munst').onclick=()=>{if(S.in){P.set(1.2,0,-299.6)}else{P.set(-30,0,-1.2)}yaw=0;menu(false);toast('Вы перемещены')};
+$('mq').textContent='Графика: '+QS.n;$('mq').onclick=()=>{const k=Object.keys(QL);QK=k[(k.indexOf(QK)+1)%3];QS=QL[QK];localStorage.setItem('tn_q',QK);$('mq').textContent='Графика: '+QS.n;applyQ();toast('Качество: '+QS.n)};
 $('mw').onclick=()=>{const o=[null,'snow','rain','fog'],n=['авто','снег','дождь','туман'];let i=(o.indexOf(W.lock)+1)%4;W.lock=o[i];$('mw').textContent='Погода: '+n[i]};
 $('mnew').onclick=()=>{if(confirm('Стереть прогресс?')){localStorage.removeItem(K);location.reload()}};
 $('bP').onclick=openPhone;
@@ -408,7 +490,7 @@ plight.intensity=S.in?0:(1-f)*.9;plight.position.set(P.x,3,P.z+1);room.intensity
 winM.forEach(m=>m.emissiveIntensity=(1-f)*1.5+.1);lampHeadM.color.setHex(f<.55?0xffcf8a:0x777060);glows.forEach(s=>s.material.opacity=clamp((.7-f)*1.6,0,1));
 if(window.roomWin)window.roomWin.material.color.setRGB(.1+.55*f,.12+.6*f,.18+.65*f);
 roadM.roughness=wt=='rain'?.3:.85;pm.color.setHex(wt=='rain'?0x9bb4d0:0xffffff);pm.size=wt=='rain'?.07:.14;pm.opacity=wt=='fog'?.4:.9;
-const sp=wt=='rain'?15:2.2;for(let i=0;i<NP;i++){const k=i*3;pp[k+1]-=(sp+(i%5)*.15)*dt;pp[k]+=Math.sin(t*.7+i)*dt*.4;if(pp[k+1]<0){pp[k+1]+=25}
+const sp=wt=='rain'?15:2.2;for(let i=0;i<QN;i++){const k=i*3;pp[k+1]-=(sp+(i%5)*.15)*dt;pp[k]+=Math.sin(t*.7+i)*dt*.4;if(pp[k+1]<0){pp[k+1]+=25}
 if(pp[k]-P.x>30)pp[k]-=60;else if(pp[k]-P.x<-30)pp[k]+=60;if(pp[k+2]-P.z>30)pp[k+2]-=60;else if(pp[k+2]-P.z<-30)pp[k+2]+=60}pg.attributes.position.needsUpdate=true;pts.visible=!S.in;
 if(lp)lp.frequency.value=S.fx>0?180+Math.sin(t*2)*120:wt=='rain'?1400:450+Math.sin(t*.3)*150;
 cvs.style.filter=S.fx>0?`blur(${(1+Math.sin(t*1.2))*1.4*fx}px) saturate(${1+.8*fx}) hue-rotate(${Math.sin(t*.5)*25*fx}deg)`:'none';
@@ -434,7 +516,7 @@ for(let k=0;k<6;k++){cx=P.x-Math.sin(yaw)*Math.cos(ph2)*dist*sc;cz=P.z-Math.cos(
 if(S.in){cx=clamp(cx,-3.4,3.4);cz=clamp(cz,-302.7,-297.3);cy=Math.min(cy,2.5)}
 cam.position.set(cx,Math.max(.4,cy),cz);cam.lookAt(P.x,1.4,P.z);
 /* NPC и маркеры */
-kira.visible=S.step==3||S.step==6;artem.visible=!S.in&&true;if(kira.visible)kira.rotation.y=Math.atan2(P.x-kira.position.x,P.z-kira.position.z);artem.rotation.y=Math.atan2(P.x-artem.position.x,P.z-artem.position.z)*(Math.hypot(P.x-artem.position.x,P.z-artem.position.z)<25?1:0)+(Math.hypot(P.x-artem.position.x,P.z-artem.position.z)<25?0:Math.PI);
+kira.visible=S.step==3||S.step==6||(S.step==9&&S.f.route!='bad');kira.rotation.z=Math.sin(t*1.1)*.012;artem.visible=!S.in&&true;if(kira.visible)kira.rotation.y=Math.atan2(P.x-kira.position.x,P.z-kira.position.z);artem.rotation.y=Math.atan2(P.x-artem.position.x,P.z-artem.position.z)*(Math.hypot(P.x-artem.position.x,P.z-artem.position.z)<25?1:0)+(Math.hypot(P.x-artem.position.x,P.z-artem.position.z)<25?0:Math.PI);
 const tg=tgt();beacon.visible=!!tg&&!busy;if(tg)beacon.position.set(tg[0],20,tg[1]);
 const a=!busy&&near();$('pr').hidden=!a;if(a)$('pr').textContent=(document.body.classList.contains('touch')?'':'E · ')+a.l();
 hudT+=dt;if(hudT>.25){hudT=0;$('b1').style.width=S.sat+'%';$('b2').style.width=S.en+'%';$('b3').style.width=S.str+'%';$('tm').innerHTML=`<span>${clk()}</span>День ${Math.floor(S.min/1440)+1} · ${Math.round(S.money)} ₽`;$('obj').textContent=OBJ[S.step];if(S.step==0&&!S.msgs.length)0;if(!(Math.floor(t)%10))save()}
@@ -447,7 +529,8 @@ addEventListener('resize',resize);resize();
 pl.position.copy(P);if(S.in)S.in=1;
 function begin(fresh){if(fresh){localStorage.removeItem(K);S=def();P.set(S.x,0,S.z);yaw=0}$('start').hidden=true;started=true;paused=false;audio();
 if(!S.msgs.length){msg('Мама','Деньги на тумбочке. Мы на смене до ночи.',1);msg('Кира','Ты живой? Давай увидимся сегодня.',1);$('bP').classList.add('dot')}
-if(!S.f.intro){S.f.intro=1;S.in=1;P.set(0,0,-299.5);yaw=Math.PI;run(()=>ask('','Сургут. Ноябрь. За окном ещё темно, в квартире тихо. Родители давно ушли. Телефон мигает на тумбочке.'))}}
+fixPos();if(!S.f.intro){S.f.intro=1;S.in=1;P.set(0,0,-300);yaw=0;run(()=>ask('','Сургут. Ноябрь. За окном ещё темно, в квартире тихо. Родители давно ушли. Телефон мигает на тумбочке. Входная дверь — справа впереди.'))}}
+function fixPos(){if(S.in){if(!(P.x>-3.4&&P.x<3.4&&P.z>-303&&P.z<-296.9)){P.set(0,0,-300);yaw=0}}else if(P.z<-250){P.set(-30,0,-1.2);yaw=0}}
 $('go').onclick=()=>begin(false);
 if(hadSave){$('go').textContent='Продолжить';$('newg').hidden=false;$('newg').onclick=()=>begin(true)}
 requestAnimationFrame(loop);
