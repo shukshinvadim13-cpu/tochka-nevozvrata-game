@@ -53,29 +53,39 @@ button:active{background:#2a313b}
 #bP.dot::after{content:'';position:absolute;top:2px;right:2px;width:10px;height:10px;border-radius:50%;background:#c4554d}
 .touch #bE{border-color:var(--acc)}
 .hint{font-size:12px;color:var(--dim)}
+#arr{position:fixed;left:50%;top:50px;transform:translateX(-50%);text-align:center;pointer-events:none;color:var(--acc);font-size:11px;text-shadow:0 1px 3px #000}
+#arr b{display:block;font-size:20px;line-height:1;transition:transform .1s}
+#mg{position:fixed;inset:0;z-index:6;background:#05070bcc;display:flex;align-items:center;justify-content:center}
+#mgt{position:relative;height:26px;background:#ffffff1c;border-radius:13px;width:100%}
+#mgz{position:absolute;top:0;height:100%;background:#6fa58a99;border-radius:13px}
+#mgb{position:absolute;top:-4px;width:6px;height:34px;background:var(--acc);border-radius:3px;margin-left:-3px}
 </style></head><body>
 <canvas id="c"></canvas>
 <div id="vig"></div>
 <div id="rot">📱↺<br>Поверните телефон горизонтально</div>
 <div id="hud"><div class="bars"><label>Сытость<i><b id="b1"></b></i></label><label>Силы<i><b id="b2"></b></i></label><label>Стресс<i><b id="b3"></b></i></label></div><div id="tm"></div></div>
 <div id="obj"></div>
+<div id="arr" hidden><b>▲</b><span id="ard"></span></div>
+<div id="mg" hidden><div class="card"><b>Смена в магазине</b><div id="mgi"></div><div id="mgt"><div id="mgz"></div><div id="mgb"></div></div><button id="mgbtn" style="padding:16px">Поставить ящик</button></div></div>
 <div id="pr" hidden></div>
 <div id="toast"></div>
 <div id="dlg" hidden><div id="dw"></div><div id="dt"></div><div id="dc"></div></div>
 <div id="phone" hidden><div class="card"><b>Телефон</b><div id="ph"></div><div id="pst"></div><button id="help" hidden>Написать Кире правду и попросить помощи</button><button id="pclose">Закрыть</button></div></div>
-<div id="menu" hidden><div class="card"><b>Пауза</b><button id="mres">Продолжить</button><button id="msave">Сохранить</button><button id="munst">Я застрял / вернуть на место</button><button id="mq">Графика</button><button id="mw">Погода: авто</button><button id="mnew">Начать заново</button></div></div>
+<div id="menu" hidden><div class="card"><b>Пауза</b><button id="mres">Продолжить</button><button id="msave">Сохранить</button><button id="munst">Я застрял / вернуть на место</button><button id="mq">Графика</button><button id="mw">Погода: авто</button><button id="mmus">Музыка</button><button id="mnew">Начать заново</button></div></div>
 <div id="start"><div class="card" style="background:none;border:0;text-align:center;justify-items:center;gap:14px"><h1>Точка невозврата</h1><div style="color:var(--acc)">Глава 1 · Обычный день</div><p>Сургут, ноябрь. Игра о одиночестве, любви и последствиях решений. Затрагивает тему зависимости и не романтизирует её. 18+</p><button id="go" style="background:var(--acc);color:#111;font-weight:600;padding:12px 28px">Играть</button><button id="newg" hidden>Новая игра</button><p class="hint">WASD — движение · мышь — камера · Shift — бег · E — действие · P — телефон · Esc — пауза</p></div></div>
 <div id="fade"></div>
 <div id="ctl"><div id="zone"><i id="base"><i id="knob"></i></i></div><button class="b" id="bE">Действие</button><button class="b" id="bR">Бег</button><button class="b" id="bP">📱</button></div>
 <button id="bM">⏸</button>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/fflate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FBXLoader.js"></script>
 <script>
 const $=i=>document.getElementById(i),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t,wait=ms=>new Promise(r=>setTimeout(r,ms));
 if('ontouchstart'in window||matchMedia('(pointer:coarse)').matches)document.body.classList.add('touch');
 /* ===== состояние и сохранение ===== */
 const K='tochka_nevozvrata_v1';
-const def=()=>({sat:78,en:70,str:24,money:420,trust:50,rep:50,add:0,min:540,step:0,fx:0,x:-30,z:1.6,in:0,yaw:0,msgs:[],f:{}});
+const def=()=>({sat:78,en:70,str:24,money:420,trust:50,rep:50,add:0,min:540,step:0,fx:0,x:-30,z:1.6,in:0,yaw:0,msgs:[],f:{},love:50,self:60,cd:0});
 let S;try{S=Object.assign(def(),JSON.parse(localStorage.getItem(K)))}catch(e){S=def()}
 const hadSave=!!localStorage.getItem(K)&&S.step>0;
 const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
@@ -270,7 +280,13 @@ const NPCM=[];
 function npcModel(url,grp,hgt){if(!THREE.GLTFLoader)return;try{new THREE.GLTFLoader().load(url,g=>{try{const m=g.scene;m.traverse(o=>{if(o.isMesh){o.castShadow=true;o.frustumCulled=false}});
 const b=new THREE.Box3().setFromObject(m),k=hgt/Math.max(.01,b.max.y-b.min.y);m.scale.multiplyScalar(k);m.updateMatrixWorld(true);const b2=new THREE.Box3().setFromObject(m);m.position.y-=b2.min.y;
 grp.children.slice().forEach(c=>grp.remove(c));grp.add(m);if(g.animations.length){const mx=new THREE.AnimationMixer(m),ac=mx.clipAction(g.animations.find(c=>/idle|stand/i.test(c.name))||g.animations[0]);ac.play();NPCM.push(mx)}}catch(e){console.warn(url,e)}},undefined,()=>console.warn(url+' не найден'))}catch(e){}}
-npcModel('kira.glb',kira,1.66);npcModel('artem.glb',artem,1.8);
+npcModel('artem.glb',artem,1.8);
+(function(){const fb=()=>npcModel('kira.glb',kira,1.66);if(!THREE.FBXLoader)return fb();
+try{new THREE.FBXLoader().load('models/kira.fbx',m=>{try{
+m.traverse(o=>{if(o.isMesh){o.castShadow=true;o.frustumCulled=false;(Array.isArray(o.material)?o.material:[o.material]).forEach(x=>{if(!x)return;if(x.specular)x.specular.setScalar(.06);x.shininess=18;if(/hair|lash/i.test(o.name)){x.transparent=false;x.alphaTest=.45;x.side=THREE.DoubleSide}x.needsUpdate=true})}});
+const b=new THREE.Box3().setFromObject(m),k=1.66/Math.max(.01,b.max.y-b.min.y);m.scale.multiplyScalar(k);m.updateMatrixWorld(true);const b2=new THREE.Box3().setFromObject(m);m.position.y-=b2.min.y;
+kira.children.slice().forEach(c=>kira.remove(c));kira.add(m);
+if(m.animations&&m.animations.length){const mx=new THREE.AnimationMixer(m);mx.clipAction(m.animations[0]).play();NPCM.push(mx)}}catch(e){console.warn('kira.fbx',e);fb()}},undefined,()=>{console.warn('models/kira.fbx не найден');fb()})}catch(e){fb()}})();
 /* ===== квартира ===== */
 (function(){const cz=-300,wm=MS(0xb9b2a2,.95),fl=MS(0x6b5238,.7);
 const fb=new THREE.Mesh(new THREE.PlaneGeometry(7.4,6.4),fl);fb.rotation.x=-Math.PI/2;fb.position.set(0,.01,cz);fb.receiveShadow=true;scene.add(fb);
@@ -336,34 +352,79 @@ function applyQ(){R.setPixelRatio(Math.min(devicePixelRatio,QS.pr));R.shadowMap.
 QN=QS.snow;pg.setDrawRange(0,QN);cam.far=QS.far;cam.updateProjectionMatrix();scene.traverse(o=>{if(o.material)o.material.needsUpdate=true});resize()}
 const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,40,8),new THREE.MeshBasicMaterial({color:0xe0a458,transparent:true,opacity:.35,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));beacon.position.y=20;scene.add(beacon);
 /* ===== звук ===== */
-let AC,lp;
-function audio(){try{AC=new(window.AudioContext||window.webkitAudioContext)();const b=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;const s=AC.createBufferSource();s.buffer=b;s.loop=true;lp=AC.createBiquadFilter();lp.frequency.value=500;const g=AC.createGain();g.gain.value=.05;s.connect(lp);lp.connect(g);g.connect(AC.destination);s.start()}catch(e){}}
-function beep(){if(!AC)return;const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=880;g.gain.value=.05;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+.25);o.stop(AC.currentTime+.25)}
+let AC,lp,AU={},MUS={on:localStorage.getItem('tn_m')!=='0',i:0},FXI=0,CDI=0,lastSn=0;
+const sfx=(n,...a)=>{try{if(AC&&AC.state!=='closed'&&AU[n])AU[n](...a)}catch(e){}};
+const beep=()=>sfx('msg');
+function audio(){try{
+if(AC){if(AC.state==='suspended')AC.resume();return}
+const A=AC=new(window.AudioContext||window.webkitAudioContext)();
+const comp=A.createDynamicsCompressor();AU.out=A.createGain();AU.out.gain.value=.9;AU.out.connect(comp);comp.connect(A.destination);
+const L=A.sampleRate*2,ir=A.createBuffer(2,L,A.sampleRate);for(let c=0;c<2;c++){const d=ir.getChannelData(c);for(let i=0;i<L;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/L,2.8)}
+AU.rev=A.createConvolver();AU.rev.buffer=ir;AU.revG=A.createGain();AU.revG.gain.value=.22;AU.rev.connect(AU.revG);AU.revG.connect(AU.out);
+const nb=AU.nb=A.createBuffer(1,A.sampleRate*3,A.sampleRate),nd=nb.getChannelData(0);let b0=0,b1=0,b2=0;for(let i=0;i<nd.length;i++){const w=Math.random()*2-1;b0=.99765*b0+w*.099;b1=.963*b1+w*.2965;b2=.57*b2+w*1.0526;nd[i]=(b0+b1+b2+w*.1848)*.11}
+const lay=(type,f,q)=>{const s=A.createBufferSource();s.buffer=nb;s.loop=true;const fl=A.createBiquadFilter();fl.type=type;fl.frequency.value=f;fl.Q.value=q;const gn=A.createGain();gn.gain.value=0;s.connect(fl);fl.connect(gn);gn.connect(AU.out);s.start(0,Math.random()*2);return{fl,gn}};
+AU.wind=lay('lowpass',400,.5);AU.rain=lay('highpass',2600,.4);AU.city=lay('lowpass',150,.7);lp=AU.wind.fl;
+const fxf=AU.fxf=A.createBiquadFilter();fxf.type='lowpass';fxf.frequency.value=300;const fxg=AU.fxg=A.createGain();fxg.gain.value=0;fxf.connect(fxg);fxg.connect(AU.out);fxg.connect(AU.rev);
+[110,111.6,165.4].forEach((f,i)=>{const o=A.createOscillator();o.type=i<2?'sawtooth':'sine';o.frequency.value=f;o.connect(fxf);o.start()});
+const lf=A.createOscillator(),lg=A.createGain();lf.frequency.value=.32;lg.gain.value=180;lf.connect(lg);lg.connect(fxf.frequency);lf.start();
+const tin=AU.tin=A.createGain();tin.gain.value=0;tin.connect(AU.out);[6300,6340].forEach(f=>{const o=A.createOscillator();o.frequency.value=f;o.connect(tin);o.start()});
+AU.carT=5;AU.musT=setInterval(musTick,2600);
+['pointerdown','touchend','keydown'].forEach(e=>addEventListener(e,()=>{if(AC&&AC.state==='suspended')AC.resume()},{passive:true}));
+document.addEventListener('visibilitychange',()=>{if(AC){if(document.hidden)AC.suspend();else AC.resume()}});
+}catch(e){console.warn('audio',e)}}
+AU.tone=(f,d,type,vol,w,slide,att)=>{const A=AC,o=A.createOscillator(),g=A.createGain(),t0=A.currentTime+(w||0),at=Math.min(att||.015,d*.5);o.type=type||'sine';o.frequency.setValueAtTime(f,t0);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t0+d);g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(vol||.08,t0+at);g.gain.exponentialRampToValueAtTime(.0001,t0+d);o.connect(g);g.connect(AU.out);g.connect(AU.rev);o.start(t0);o.stop(t0+d+.05)};
+AU.burst=(f,q,d,vol,type,w)=>{const A=AC,s=A.createBufferSource();s.buffer=AU.nb;const fl=A.createBiquadFilter();fl.type=type||'bandpass';fl.frequency.value=f;fl.Q.value=q;const g=A.createGain(),t0=A.currentTime+(w||0);g.gain.setValueAtTime(vol,t0);g.gain.exponentialRampToValueAtTime(.0001,t0+d);s.connect(fl);fl.connect(g);g.connect(AU.out);s.start(t0,Math.random()*2.5,d+.05)};
+AU.step=(run,ind)=>{if(ind){AU.burst(200,.8,.09,1,'lowpass');AU.tone(78,.08,'sine',.06)}else{AU.burst(2000+Math.random()*700,1.1,.11,run?1.8:1.1,'bandpass');AU.burst(320,.7,.08,.6,'lowpass')}};
+AU.door=()=>{AU.burst(300,.8,.35,2,'lowpass');AU.tone(90,.3,'sine',.12,0,50);AU.burst(3500,2,.03,1,'highpass',.28)};
+AU.msg=()=>{AU.tone(784,.22,'sine',.07);AU.tone(1175,.4,'sine',.06,.14)};
+AU.click=()=>AU.tone(520,.06,'triangle',.04);
+AU.coin=()=>{AU.tone(1318,.14,'triangle',.06);AU.tone(1760,.3,'triangle',.05,.09)};
+AU.pang=()=>{AU.tone(55,1.1,'sine',.24,0,32);AU.tone(233,1.2,'triangle',.02);AU.tone(246.9,1.2,'triangle',.02);try{navigator.vibrate&&navigator.vibrate(70)}catch(e){}};
+AU.warm=()=>{AU.tone(392,1,'sine',.05,0,0,.1);AU.tone(494,1,'sine',.04,.12);AU.tone(587,1.3,'sine',.035,.24)};
+AU.sleep=()=>AU.tone(330,2.6,'sine',.05,0,165,.5);
+AU.heart=v=>{AU.tone(58,.14,'sine',v||.3,0,38);AU.tone(52,.16,'sine',(v||.3)*.8,.2,34)};
+AU.fxOn=()=>{AU.tone(80,3,'sawtooth',.03,0,240,1.5);AU.burst(600,.5,2.5,1,'bandpass')};
+AU.fxOff=()=>AU.tone(70,1.6,'sine',.22,0,35);
+AU.voice=(w,t)=>{if(!w)return;const b=/Кира/.test(w)?340:/Артём|Незнакомец/.test(w)?120:/Бабушка/.test(w)?230:/Макс/.test(w)?150:190,n=Math.min(14,Math.ceil(t.length/7));for(let i=0;i<n;i++)AU.tone(b*(1+Math.random()*.45),.06,'triangle',.03,i*.085)};
+AU.car=()=>{const A=AC,s=A.createBufferSource();s.buffer=AU.nb;s.loop=true;const fl=A.createBiquadFilter();fl.type='bandpass';fl.Q.value=.8;const g=A.createGain(),p=A.createStereoPanner?A.createStereoPanner():null,n=A.currentTime,d=6,dir=Math.random()<.5?-1:1;fl.frequency.setValueAtTime(250,n);fl.frequency.linearRampToValueAtTime(600,n+d/2);fl.frequency.linearRampToValueAtTime(220,n+d);g.gain.setValueAtTime(.0001,n);g.gain.linearRampToValueAtTime(.7,n+d/2);g.gain.linearRampToValueAtTime(.0001,n+d);s.connect(fl);fl.connect(g);if(p){p.pan.setValueAtTime(-dir*.9,n);p.pan.linearRampToValueAtTime(dir*.9,n+d);g.connect(p);p.connect(AU.out)}else g.connect(AU.out);s.start(n);s.stop(n+d+.1)};
+const CHD=[[110,220,261.6,329.6],[87.3,174.6,220,261.6],[130.8,261.6,329.6,392],[98,196,246.9,293.7]];
+function musTick(){if(!MUS.on||!AC||AC.state!=='running'||!started)return;const c=CHD[MUS.i++%4],fx=FXI>.2;
+c.forEach((f,i)=>AU.tone(fx?f*(1+(Math.random()-.5)*.02):f,5.2,i?'sine':'triangle',i?.02:.028,i*.08,0,1.4));
+if(S.str>70)AU.tone(c[1]*1.0595,4,'sine',.011,.3,0,1.5);
+for(let i=0;i<4;i++)if(Math.random()<.75)AU.tone(c[1+i%3]*2*(Math.random()<.2?2:1),1.4,'triangle',.028,.5+i*.55+Math.random()*.1,0,.02)}
+function sfxEnv(t,wt,f){if(!AC||!AU.wind||AC.state!=='running')return;const n=AC.currentTime,set=(p,v,tc)=>p.setTargetAtTime(v,n,tc||.4),ind=S.in;
+set(AU.wind.gn.gain,ind?.012:.05+.025*(1-f)+(wt=='fog'?.01:0)+Math.max(0,Math.sin(t*.25))*.015);
+set(AU.wind.fl.frequency,ind?220:380+Math.sin(t*.31)*160-FXI*150);
+set(AU.rain.gn.gain,wt=='rain'?(ind?.02:.055):0);
+set(AU.city.gn.gain,ind?.01:.035*(1-.6*f));
+set(AU.fxg.gain,.1*FXI);set(AU.fxf.frequency,200+FXI*500+Math.sin(t*.5)*120);
+set(AU.tin.gain,.012*CDI);set(AU.revG.gain,.22+FXI*.55);
+if(!ind&&t>AU.carT){AU.carT=t+14+Math.random()*25;AU.car()}}
 /* ===== игровая логика ===== */
 let busy=false,paused=true,started=false,yaw=S.yaw||0,pitch=.35,jx=0,jy=0,runT=false,ph=0;
 const P=new THREE.Vector3(S.x,0,S.z),keys={};
-const OBJ=['Проверь телефон (📱 или P)','Выйди из квартиры','Купи еду в магазине','Встреться с Кирой на остановке','Найди Артёма у гаражей','Вернись домой и ляг спать','Глава 2 · Поговори с Кирой на остановке','Глава 2 · Найди Артёма у гаражей','Глава 2 · Вернись домой и ляг спать','Глава 3 · Утро. Найди нужного человека','Глава 3 · Вернись домой и ляг спать','Свободная прогулка. Продолжение следует'];
+const OBJ=['Проверь телефон (📱 или P)','Выйди из квартиры','Купи еду в магазине','Встреться с Кирой на остановке','Найди Артёма у гаражей','Вернись домой и ляг спать','Глава 2 · Поговори с Кирой на остановке','Глава 2 · Найди Артёма у гаражей','Глава 2 · Вернись домой и ляг спать','Глава 3 · Утро. Найди нужного человека','Глава 3 · Вернись домой и ляг спать','Глава 4 · Приходи на остановку: Кира ждёт','Глава 4 · Вечером у магазина','Глава 4 · Кира ждёт на лавочке во дворе','Глава 4 · Вернись домой и ляг спать','Свободная прогулка. Продолжение следует'];
 const hh=()=>(S.min/60)%24,pad=n=>String(Math.floor(n)).padStart(2,'0'),clk=()=>pad(hh())+':'+pad(S.min%60);
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>e.classList.remove('on'),4000)}
 function msg(f,t,quiet){S.msgs.unshift({f,t,h:clk()});if(!quiet){toast(f+': '+t);beep();$('bP').classList.add('dot')}}
-function ask(w,t,ch){return new Promise(res=>{$('dw').textContent=w;const e=$('dt');e.textContent=t;e.style.fontStyle=w?'normal':'italic';const b=$('dc');b.innerHTML='';(ch||['Далее']).forEach((x,i)=>{const k=document.createElement('button');k.textContent=(ch&&ch.length>1?(i+1)+'. ':'')+x;k.onclick=()=>{b.innerHTML='';$('dlg').hidden=true;res(i)};b.appendChild(k)});$('dlg').hidden=false})}
+function ask(w,t,ch){return new Promise(res=>{$('dw').textContent=w;sfx('voice',w,t);const e=$('dt');e.textContent=t;e.style.fontStyle=w?'normal':'italic';const b=$('dc');b.innerHTML='';(ch||['Далее']).forEach((x,i)=>{const k=document.createElement('button');k.textContent=(ch&&ch.length>1?(i+1)+'. ':'')+x;k.onclick=()=>{sfx('click');b.innerHTML='';$('dlg').hidden=true;res(i)};b.appendChild(k)});$('dlg').hidden=false})}
 async function run(fn){if(busy)return;busy=true;try{await fn()}finally{busy=false;save()}}
 async function fade(txt,fn){const f=$('fade');f.textContent=txt||'';f.style.opacity=1;await wait(900);fn&&fn();await wait(900);f.style.opacity=0;f.textContent=''}
-const chg=o=>{for(const k in o)S[k]=k=='money'?S[k]+o[k]:clamp(S[k]+o[k],0,100)};
-function go(i){return fade('',()=>{S.in=i;if(i){P.set(1.4,0,-299.4);yaw=0}else{P.set(-30,0,-1.2);yaw=0}})}
+const chg=o=>{for(const k in o)S[k]=k=='money'?S[k]+o[k]:clamp(S[k]+o[k],0,100);if(o.trust<=-6||o.self<=-6||o.love<=-6)sfx('pang');else if(o.trust>=8||o.love>=8)sfx('warm')};
+function go(i){sfx('door');return fade('',()=>{S.in=i;if(i){P.set(1.4,0,-299.4);yaw=0}else{P.set(-30,0,-1.2);yaw=0}})}
 const hrs=m=>{const e=Math.floor(m/60);return m};
 async function buy(){if(S.money<150){await ask('','Денег не хватает. Нужно хотя бы 150 ₽.');return}
-S.money-=150;chg({sat:40,str:-3});await ask('','Хлеб, сосиски, пачка чая. Ничего особенного, но хотя бы не пусто в желудке.');
+S.money-=150;sfx('coin');chg({sat:40,str:-3});await ask('','Хлеб, сосиски, пачка чая. Ничего особенного, но хотя бы не пусто в желудке.');
 if(S.step==2){S.step=3;msg('Кира','Я на остановке у твоего двора. Выйдешь?')}}
 async function work(){if(S.en<20){await ask('','Нет сил. Ноги едва держат.');return}
-await fade('Две смены на кассе пролетели как один длинный день…',()=>{S.min+=120;S.money+=350;chg({en:-20,sat:-10,str:4,rep:2})})}
+const sc=await miniWork(),pay=150+sc*50;await fade('Смена на кассе и в зале пролетела…',()=>{S.min+=120;S.money+=pay;chg({en:-20,sat:-10,str:4,rep:2})});toast('Смена закончена: +'+pay+' ₽')}
 async function fridge(){await ask('','Холодильник почти пустой. На дверце записка: «Мы на смене. Не жди». Ты давно перестал ждать.');if(!S.f.note){S.f.note=1;S.money+=200;toast('Под запиской лежит 200 ₽')}}
-async function sleepAct(){const h=hh();if(S.en>80&&h>=7&&h<21&&S.step!=8&&S.step!=10){await ask('','Спать не хочется.');return}
-const bad=S.add>20;await fade('Ты проваливаешься в сон…',()=>{const m=S.min%1440;S.min=S.min-m+(m<420?420:1860);chg({en:bad?40:75,str:bad?8:-12,sat:-20})});
+async function sleepAct(){const h=hh();if(S.en>80&&h>=7&&h<21&&S.step!=8&&S.step!=10&&S.step!=14){await ask('','Спать не хочется.');return}
+const bad=S.add>20;sfx('sleep');await fade('Ты проваливаешься в сон…',()=>{const m=S.min%1440;S.min=S.min-m+(m<420?420:1860);chg({en:bad?40:75,str:bad?8:-12,sat:-20})});
 if(bad)await ask('','Сон был рваным. Тело ломит, мысли возвращаются к одному и тому же.');
 if(S.step==5){await ask('',S.f.acc?'Ты лёг, но тревога не отпускала. Ты знаешь, чего тебе хочется, и это пугает.':S.f.callK?'Ты уснул с мыслью, что кому-то всё-таки не всё равно.':'Ты впервые за долгое время уснул без тяжести.');
 await ask('',S.trust>=55?'Кира ещё ответит тебе. Может быть.':'Кира всё реже отвечает. Между вами что-то треснуло.');
-await ask('','Конец главы 1. Твои решения сохранены и повлияют на историю дальше.');S.step=6;msg('Кира','Доброе утро. Если захочешь поговорить — я у остановки.');toast('Глава 2 · «Эхо»')}if(S.step==8)await ending2();if(S.step==10)await ending3()}
+await ask('','Конец главы 1. Твои решения сохранены и повлияют на историю дальше.');S.step=6;msg('Кира','Доброе утро. Если захочешь поговорить — я у остановки.');toast('Глава 2 · «Эхо»')}if(S.step==8)await ending2();if(S.step==10)await ending3();if(S.step==14)await ending4()}
 async function talkKira(){
 await ask('Кира','Ты пропал на два дня. Я писала. Ты хоть читал?');
 let c=await ask('Вадим','Что ответить?',['Телефон сел. Прости, правда.','Ты тоже не рвалась звонить.','Пожать плечами и промолчать.']);
@@ -381,7 +442,7 @@ async function talkArtem(){
 await ask('Артём','О, пришёл. Слушай, у меня есть кое-что, чтобы голова не болела. Первый раз бесплатно. Все так делают.');
 const c=await ask('Вадим','Ты один, дома пусто, Кира сегодня сказала «по-настоящему».',['Нет. Мне это не нужно.','Давай. Один раз.','Подумаю. Лучше позвоню Кире.']);
 if(c==0){S.f.refuse=1;chg({str:4,rep:-3,trust:3});await ask('Артём','Как знаешь. Дверь открыта.');await ask('','Руки дрожат от напряжения, но уйти было легче, чем ты думал.')}
-else if(c==1){S.f.acc=1;S.add=clamp(S.add+18,0,100);S.fx=80;chg({str:-8});S.f.t=0;await ask('Артём','Видишь? Расслабься. Всё нормально.');await ask('','Мир мягко плывёт. Звуки тянутся, время рассыпается. Но где-то на краю уже шевелится тревога.')}
+else if(c==1){S.f.acc=1;S.add=clamp(S.add+18,0,100);startFx(100);chg({str:-8});S.f.t=0;await ask('Артём','Видишь? Расслабься. Всё нормально.');await ask('','Мир мягко плывёт. Звуки тянутся, время рассыпается. Но где-то на краю уже шевелится тревога.')}
 else{S.f.callK=1;chg({trust:4,rep:-5});await ask('Артём','Беги к своей Кире.');msg('Кира','Ты позвонил. Я рядом, если что. Приходи домой, поговорим.')}
 S.step=5}
 /*STORY2*//* ===== Глава 2 · «Эхо» ===== */
@@ -436,8 +497,85 @@ else if(c==1){chg({rep:4,str:10,trust:3});S.f.out=1;await ask('Незнаком�
 else{S.f.deep=1;S.money+=4000;chg({rep:-12,str:15,add:5,trust:-8});await ask('Незнакомец','Вот это разговор. Адрес пришлю.')}
 S.step=10;msg('Кира',S.f.deep?'Ты не отвечаешь два часа. Что происходит?':'Ты в порядке? Напиши мне.')}
 async function ending3(){await ask('',S.f.center?'Перед сном ты открываешь календарь и ставишь пометку: «пятница, центр». Рука не дрожит.':S.f.deep?'Ты лежишь в темноте. Телефон на тумбочке то и дело вспыхивает. Ты не берёшь трубку.':'Ты лежишь и считаешь трещины на потолке. Завтра будет ещё один день.');
-await ask('',S.f.deep?'Конец главы 3. Дорога назад становится всё уже. Продолжение: «Глава 4».':S.f.center?'Конец главы 3. У тебя есть план и человек, который идёт рядом. Продолжение: «Глава 4».':'Конец главы 3. Решения впереди. Продолжение: «Глава 4».');S.step=11}
+await ask('',S.f.deep?'Конец главы 3. Дорога назад становится всё уже. Продолжение: «Глава 4».':S.f.center?'Конец главы 3. У тебя есть план и человек, который идёт рядом. Продолжение: «Глава 4».':'Конец главы 3. Решения впереди. Продолжение: «Глава 4».');S.step=11;msg('Кира','Приходи утром на остановку. Нам надо поговорить. Одной мне не справиться.');toast('Глава 4 · «Шрамы»')}
+
+/* ===== Глава 4 · «Шрамы» и новые механики ===== */
+const KPOS={3:[5,35.4],6:[5,35.4],9:[5,35.4],11:[5,35.4],12:[19,6.5],13:[-20,4.2]};
+const MAX=person({top:0x2f4f6a,leg:0x20232a,skin:0xdcb08e,hair:0x3a2a1c,shoe:0xeeeeee});MAX.position.set(21,0,6.4);MAX.visible=false;
+function startFx(sec){S.fx=sec;S.cd=0;sfx('fxOn')}
+let HB=0,CRV=0;
+function extraTick(dt,t){
+if(!busy&&!paused){HB-=dt;if(HB<0){const f=FXI>.3,h=S.str>82;HB=f?.85:h?1:2;if(f||h)sfx('heart',f?.34:.16)}
+if(S.cd>0)S.cd-=dt;
+if(S.add>=10&&S.fx<=0&&S.step>=5){CRV+=dt*(S.add>40?1.6:1);if(CRV>110){CRV=0;run(craving)}}}
+MAX.visible=S.step==12&&!S.in;if(MAX.visible)MAX.rotation.y=Math.atan2(P.x-MAX.position.x,P.z-MAX.position.z);
+const kp=KPOS[S.step];if(kp&&kira.visible)kira.position.set(kp[0],0,kp[1]);
+const tg=tgt(),ar=$('arr');if(tg&&!busy&&!paused){const dx=tg[0]-P.x,dz=tg[1]-P.z,sy=Math.sin(yaw),cy=Math.cos(yaw);ar.hidden=false;ar.firstElementChild.style.transform='rotate('+Math.atan2(-dx*cy+dz*sy,dx*sy+dz*cy)+'rad)';$('ard').textContent=Math.round(Math.hypot(dx,dz))+' м'}else ar.hidden=true}
+async function craving(){sfx('heart',.3);
+const c=await ask('','Тянет. Руки не находят места. В голове одна мысль, и она очень громкая.',['Написать Кире: попросить побыть на связи.','Выйти на воздух и пройтись.','Написать Артёму.']);
+if(c==0){chg({add:-4,str:-5,trust:2,love:2});msg('Кира','Я тут. Дыши. Считай до десяти вместе со мной.')}
+else if(c==1){chg({add:-2,str:-3,en:-5});toast('Мороз отрезвил. Стало чуть легче.')}
+else{S.f.relapse=(S.f.relapse||0)+1;msg('Артём','Ща скину адрес.');S.add=clamp(S.add+10,0,100);S.money=Math.max(0,S.money-400);chg({self:-8,str:-4});startFx(75);await ask('','Ты знал, чем это кончится. Всё равно написал. Деньги ушли, а стыд остался.')}}
+function miniWork(){return new Promise(res=>{const o=$('mg'),bar=$('mgb'),zn=$('mgz'),btn=$('mgbtn'),info=$('mgi');let n=0,ok=0,x=0,dir=1,sp=1.1,raf,zs;const zw=.2;o.hidden=false;
+const nz=()=>{zs=Math.random()*(1-zw);zn.style.left=zs*100+'%';zn.style.width=zw*100+'%'};nz();let last=performance.now();
+const tick=t=>{const d=(t-last)/1000;last=t;x+=dir*sp*d;if(x>1){x=1;dir=-1}if(x<0){x=0;dir=1}bar.style.left=x*100+'%';raf=requestAnimationFrame(tick)};raf=requestAnimationFrame(tick);
+info.textContent='Расставляй товар: жми, когда метка в зелёной зоне';
+btn.onclick=()=>{n++;if(x>=zs&&x<=zs+zw){ok++;sfx('coin')}else sfx('click');info.textContent='Ящик '+n+'/5 · точных: '+ok;sp+=.25;nz();if(n>=5){cancelAnimationFrame(raf);o.hidden=true;res(ok)}}})}
+async function flowers(){if(S.money<300){await ask('','Тюльпаны стоят 300 ₽. У тебя столько нет.');return}S.money-=300;S.f.flowers=1;sfx('coin');await ask('','Три тюльпана в мятой бумаге. Продавщица смотрит с пониманием. «Для девушки?» Ты пожимаешь плечами.')}
+async function rest(){await fade('Ты сидишь на лавочке и смотришь, как падает снег…',()=>{S.min+=30;chg({str:-7,en:8})});toast('Тишина помогла. Немного.')}
+async function talkKira4a(){let c;
+await ask('','Кира стоит спиной, обхватив плечи руками. Когда оборачивается, тушь размазана до скул.');
+await ask('Кира',S.f.deep?'Ты не брал трубку. Я всю ночь представляла, где ты. Это ужасно: не знать, жив человек или нет.':'Я не спала. Совсем. Ходила по комнате и ненавидела всё вокруг. Тебя тоже.');
+c=await ask('Вадим','Хочется и обнять её, и отступить на шаг.',['«Что случилось?»','Молча обнять.','«Ты опять была с кем-то?»']);
+if(c==0){chg({love:3});await ask('Кира','Ты всегда спрашиваешь «что случилось». Как врач. А я хочу, чтобы ты хоть раз разозлился. Чтобы почувствовал хоть что-то.')}
+else if(c==1){chg({love:5,trust:2});await ask('Кира','Не надо меня жалеть. Я этого не заслужила… Ладно. Постой так ещё минуту.')}
+else{chg({trust:-5,str:6,love:-2});S.f.jealous=1;await ask('Кира','Вот. Теперь ещё и допрос. Ты понимаешь, как с тобой иногда душно?')}
+await ask('Кира','Знаешь, кто ты для меня? Тот, кто никуда не уйдёт. Это удобно. И от этого иногда так тошно, что хочется тебя оттолкнуть.');
+chg({self:-8,str:8});await ask('','Слова падают, как лёд за воротник. Внутри что-то сжимается и тихо ломается.');
+c=await ask('Вадим','Ты мог бы уйти прямо сейчас. Ты знаешь это.',['«Мне больно. Но я никуда не уйду».','«Скажи ещё раз. Глядя в глаза».','Промолчать и взять её за руку.']);
+if(c==0){chg({love:6,self:-6,trust:3});await ask('Кира','Не говори так. Мне от этого только хуже: я ведь этого не заслуживаю.')}
+else if(c==1){chg({self:5,love:2,trust:-2,str:6});await ask('Кира','(она отводит взгляд) Не могу. Прости. Не могу.')}
+else{chg({love:4,self:-4,trust:4});await ask('','Её пальцы холодные и дрожат. Она сжимает твою руку так, будто тонет.')}
+await ask('Кира','Вечером я буду у магазина с ребятами. Приходи. Только не обижайся на то, что я там скажу. Ладно?');
+await ask('','Ты киваешь. Хотя уже знаешь, что обидишься.');S.step=12;msg('Кира','Прости за утро. Я не со зла. Мне просто очень плохо.')}
+async function talkKira4b(){let c;
+await ask('','У входа в магазин смеётся компания. Кира в центре, другая: яркая, громкая, будто утра не было. Рядом Макс. Его рука лежит у неё на плече.');
+await ask('Макс','О, а вот и твой… как его… Вадим? Кира говорила, ты тихий. Прямо как мебель.');
+await ask('Кира','Макс, ну хватит! (смеётся) Да он мой друг. Мы просто дружим, правда, Вадь?');
+await ask('','Слово «друг» бьёт точнее любого кулака. Все ждут, что ты ответишь.');
+c=await ask('Вадим','Сердце колотится где-то в горле.',['Усмехнуться: «Да, друзья».','Посмотреть на Киру: «Повтори. Только честно».','Развернуться и уйти молча.']);
+if(c==0){chg({self:-10,trust:2,love:-1,str:10});await ask('Кира','(она не смотрит на тебя) Вот видишь, всё нормально.')}
+else if(c==1){chg({self:4,str:12,trust:-3});await ask('Кира','(сквозь зубы) Не при них. Пожалуйста.');await ask('Макс','Ого, драма. Пойдём, Кир, тут скучно.')}
+else{chg({self:2,str:8,love:-2});await ask('','Ты уходишь, слушая смех за спиной. В кармане дрожит телефон, но ты не достаёшь его.')}
+S.step=13;msg('Кира','Где ты? Я не хотела. Пожалуйста, ответь.');msg('Кира','Лавочка во дворе. Я буду ждать.')}
+async function talkKira4c(){let c;
+await ask('','Она сидит на лавочке, поджав ноги. Снег цепляется за ресницы. В руках потухший телефон.');
+await ask('Кира','Я такая дрянь, да? Знаю. Каждый раз хочу быть лучше, а выходит вот так.');
+if(S.f.flowers){c=await ask('Вадим','В кармане тюльпаны. Немного помятые.',['Протянуть цветы.','Оставить в кармане.']);
+if(c==0){chg({love:4,trust:6,self:-2});S.f.gaveFlowers=1;sfx('warm');await ask('Кира','Зачем… Зачем ты мне такой хороший? (она прижимает цветы к лицу и плачет)')}}
+await ask('Кира','В тот вечер, когда ты не отвечал, я поцеловала Макса. Один раз. Я хотела, чтобы ты хоть раз закричал. Ушёл. Сделал хоть что-нибудь. А ты всё прощаешь, и мне от этого ещё страшнее.');
+c=await ask('Вадим','Сначала пустота, потом жар.',['«Я ухожу».','«Я зол. Но я не уйду».','«Я знаю. Я всё равно рядом».']);
+if(c==0){S.f.left=1;await fade('Двадцать шагов. Тридцать. Снег хрустит громче, чем должен…',()=>chg({self:4,str:6}));await ask('','Ты останавливаешься у подъезда. Телефон вспыхивает: «Прости. Я без тебя не смогу». Ты стоишь минуту. Две.');chg({love:7,self:-9});await fade('Ты возвращаешься.',()=>{});await ask('Кира','(тихо) Ты вернулся… Я думала, это всё.')}
+else if(c==1){chg({love:6,self:-2,str:8});await ask('Кира','Ты имеешь право злиться. Накричи на меня. Прошу.');await ask('','Кричать нет сил. Ты просто садишься рядом.')}
+else{chg({love:8,self:-12,trust:3});await ask('Кира','Не говори так. Мне от этого больнее: ты слишком добрый для меня.')}
+c=await ask('Кира','Обещай, что не бросишь меня. Что бы я ни сделала.',['«Обещаю».','«Обещаю. Но и ты пообещай не делать мне больно».','«Не могу такое обещать».']);
+if(c==0){chg({love:6,self:-8,trust:4});await ask('Кира','Спасибо. Ты не представляешь, как мне это нужно.')}
+else if(c==1){chg({love:4,self:5,trust:2});await ask('Кира','(долго молчит) Постараюсь. Правда. Больше ничего не обещаю.')}
+else{chg({self:6,trust:-4,love:2});await ask('Кира','Тогда зачем ты здесь?..');await ask('','Ты не отвечаешь. Просто остаёшься. Не потому, что обещал, а потому что без неё тишина оглушает.')}
+S.step=14;msg('Кира','Спасибо, что остался. Спокойной ночи.')}
+async function ending4(){
+await ask('',S.love>=70?'Ты засыпаешь с её запахом на куртке. Это и утешение, и якорь.':'Ты лежишь и пытаешься понять, где кончается любовь и начинается привычка терпеть.');
+await ask('',S.self<35?'Ты почти не помнишь, когда в последний раз выбирал что-то для себя. Её радость — твоя радость, её боль — твоя вина.':S.self>=60?'Где-то глубоко ещё живёт человек, который помнит, чего он стоит. Он тихо ждёт своего часа.':'Внутри ровный шум. Ни ярости, ни надежды. Просто усталость.');
+if(S.f.acc||S.add>10)await ask('','Телефон лежит на тумбочке. В нём есть номер, который ты так и не удалил.');
+await ask('Итоги',`Привязанность к Кире: ${Math.round(S.love)} · Самоуважение: ${Math.round(S.self)} · Доверие Киры: ${Math.round(S.trust)} · Зависимость: ${Math.round(S.add)}`);
+await ask('','Конец главы 4. Кира делает больно, и ты всё равно остаёшься. Вопрос лишь в том, какой ценой. Продолжение: «Глава 5».');S.step=15;toast('Глава 4 завершена')}
+
 const IA=[
+{in:0,x:5,z:35,r:2.6,l:()=>'Поговорить с Кирой',ok:()=>S.step==11,fn:talkKira4a},
+{in:0,x:19,z:7,r:2.8,l:()=>'Подойти к Кире',ok:()=>S.step==12,fn:talkKira4b},
+{in:0,x:-20,z:4.4,r:2.6,l:()=>'Сесть рядом с Кирой',ok:()=>S.step==13,fn:talkKira4c},
+{in:0,x:25.3,z:8.2,r:1.3,l:()=>'Купить тюльпаны (300 ₽)',ok:()=>!S.f.flowers,fn:flowers},
+{in:0,x:-40,z:4.6,r:2.4,l:()=>'Посидеть и подышать',fn:rest},
 {in:0,x:5,z:35,r:2.6,l:()=>'Поговорить с Кирой',ok:()=>S.step==9&&S.f.route!='bad',fn:talkKira3},
 {in:0,x:-62,z:67.8,r:2.6,l:()=>'Поговорить с Артёмом',ok:()=>S.step==9&&S.f.route=='bad',fn:talkBad3},
 {in:0,x:5,z:35,r:2.6,l:()=>'Поговорить с Кирой',ok:()=>S.step==6,fn:talkKira2},
@@ -452,10 +590,10 @@ const IA=[
 {in:0,x:-62,z:67.8,r:2.6,l:()=>'Поговорить с Артёмом',ok:()=>S.step==4,fn:talkArtem}];
 const near=()=>{let b=null,bd=1e9;for(const a of IA){if(!!a.in!=!!S.in||(a.ok&&!a.ok()))continue;const d=Math.hypot(P.x-a.x,P.z-a.z);if(d<a.r&&d<bd){b=a;bd=d}}return b};
 const act=()=>{if(busy||paused)return;const a=near();if(a)run(a.fn)};
-function tgt(){const s=S.step,d=[2.4,-298.2];if(s<1)return null;if(s==1)return S.in?d:null;if(s==5||s==8||s==10)return S.in?[-2.2,-301.2]:[-30,-2.3];if(S.in)return d;return s==2?[25,8.2]:s==3||s==6||(s==9&&S.f.route!='bad')?[5,35]:s==4||s==7||(s==9&&S.f.route=='bad')?[-62,67.8]:null}
+function tgt(){const s=S.step,d=[2.4,-298.2];if(s<1)return null;if(s==1)return S.in?d:null;if(s==5||s==8||s==10||s==14)return S.in?[-2.2,-301.2]:[-30,-2.3];if(S.in)return d;return s==12?[19,7]:s==13?[-20,4.4]:s==2?[25,8.2]:s==3||s==6||s==11||(s==9&&S.f.route!='bad')?[5,35]:s==4||s==7||(s==9&&S.f.route=='bad')?[-62,67.8]:null}
 /* ===== телефон / меню ===== */
 function openPhone(){if(busy||paused)return;$('bP').classList.remove('dot');paused=true;$('ph').innerHTML=S.msgs.map(m=>`<div class="msg"><b>${m.f}</b><small>${m.h}</small><br>${m.t}</div>`).join('');
-const st=(n,v)=>`<div class="st">${n}<i><b style="width:${v}%"></b></i></div>`;$('pst').innerHTML=st('Доверие Киры',S.trust)+st('Репутация',S.rep)+st('Зависимость',S.add)+`<div class="st">Деньги<span>${S.money} ₽</span></div>`;
+const st=(n,v)=>`<div class="st">${n}<i><b style="width:${v}%"></b></i></div>`;$('pst').innerHTML=st('Доверие Киры',S.trust)+st('Привязанность',S.love)+st('Самоуважение',S.self)+st('Репутация',S.rep)+st('Зависимость',S.add)+`<div class="st">Деньги<span>${S.money} ₽</span></div>`;
 $('help').hidden=!(S.add>0&&S.step>=5);$('phone').hidden=false;if(S.step==0){S.step=1}}
 $('pclose').onclick=()=>{$('phone').hidden=true;paused=false};
 $('help').onclick=()=>{chg({add:-10,str:-6,trust:S.f.lied?-2:5});msg('Кира','Спасибо, что сказал. Давай справимся вместе. Я приду завтра.',1);toast('Ты рассказал правду. Стало чуть легче.');$('pclose').onclick();save()};
@@ -466,6 +604,7 @@ $('mq').textContent='Графика: '+QS.n;$('mq').onclick=()=>{const k=Object.
 $('mw').onclick=()=>{const o=[null,'snow','rain','fog'],n=['авто','снег','дождь','туман'];let i=(o.indexOf(W.lock)+1)%4;W.lock=o[i];$('mw').textContent='Погода: '+n[i]};
 $('mnew').onclick=()=>{if(confirm('Стереть прогресс?')){localStorage.removeItem(K);location.reload()}};
 $('bP').onclick=openPhone;
+$('mmus').textContent='Музыка: '+(MUS.on?'вкл':'выкл');$('mmus').onclick=()=>{MUS.on=!MUS.on;localStorage.setItem('tn_m',MUS.on?'1':'0');$('mmus').textContent='Музыка: '+(MUS.on?'вкл':'выкл')};
 /* ===== ввод ===== */
 addEventListener('keydown',e=>{keys[e.code]=1;if(!started)return;if(e.code=='Escape'){menu(!paused)}else if(e.code=='KeyE')act();else if(e.code=='KeyP')$('phone').hidden?openPhone():$('pclose').onclick();
 else if(!$('dlg').hidden){const b=$('dc').children,n=e.code.startsWith('Digit')?+e.code.slice(5)-1:(b.length==1&&(e.code=='Enter'||e.code=='Space'))?0:-1;if(b[n])b[n].click()}});
@@ -498,38 +637,69 @@ if(window.roomWin)window.roomWin.material.color.setRGB(.1+.55*f,.12+.6*f,.18+.65
 roadM.roughness=wt=='rain'?.3:.85;pm.color.setHex(wt=='rain'?0x9bb4d0:0xffffff);pm.size=wt=='rain'?.07:.14;pm.opacity=wt=='fog'?.4:.9;
 const sp=wt=='rain'?15:2.2;for(let i=0;i<QN;i++){const k=i*3;pp[k+1]-=(sp+(i%5)*.15)*dt;pp[k]+=Math.sin(t*.7+i)*dt*.4;if(pp[k+1]<0){pp[k+1]+=25}
 if(pp[k]-P.x>30)pp[k]-=60;else if(pp[k]-P.x<-30)pp[k]+=60;if(pp[k+2]-P.z>30)pp[k+2]-=60;else if(pp[k+2]-P.z<-30)pp[k+2]+=60}pg.attributes.position.needsUpdate=true;pts.visible=!S.in;
-if(lp)lp.frequency.value=S.fx>0?180+Math.sin(t*2)*120:wt=='rain'?1400:450+Math.sin(t*.3)*150;
-cvs.style.filter=S.fx>0?`blur(${(1+Math.sin(t*1.2))*1.4*fx}px) saturate(${1+.8*fx}) hue-rotate(${Math.sin(t*.5)*25*fx}deg)`:'none';
+sfxEnv(t,wt,f);
+cvs.style.filter='none';
 cam.fov=60+Math.sin(t*1.3)*7*fx;cam.updateProjectionMatrix()}
-function update(dt,t){heroTick(dt);NPCM.forEach(x=>x.update(dt));
+function update(dt,t){heroTick(dt);NPCM.forEach(x=>x.update(dt));extraTick(dt,t);
 if(!busy){const kx=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0),ky=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0);
 let ix=kx+jx,iy=ky+jy;const l=Math.hypot(ix,iy);if(l>1){ix/=l;iy/=l}
 const run=(keys.ShiftLeft||keys.ShiftRight||runT)&&l>.1&&S.en>5,sx=Math.sin(yaw),cz=Math.cos(yaw);let dx=sx*iy-cz*ix,dz=cz*iy+sx*ix;
 if(S.fx>0){dx+=Math.sin(t*1.7)*.25*Math.hypot(dx,dz);dz+=Math.cos(t*1.3)*.25*Math.hypot(dx,dz)}
 const sp=(run?4.2:1.7)*(S.en<12?.7:1)*(S.fx>0?.75:1),m=Math.hypot(dx,dz);
-if(m>.05){P.x+=dx*sp*dt;P.z+=dz*sp*dt;let d=Math.atan2(dx,dz)-pl.rotation.y;d=Math.atan2(Math.sin(d),Math.cos(d));pl.rotation.y+=d*Math.min(1,dt*12);ph+=sp*dt*2.2;anim(pl,ph,.7,sp);if(run)S.en=clamp(S.en-dt*.5,0,100)}else anim(pl,0,0);
+if(m>.05){P.x+=dx*sp*dt;P.z+=dz*sp*dt;let d=Math.atan2(dx,dz)-pl.rotation.y;d=Math.atan2(Math.sin(d),Math.cos(d));pl.rotation.y+=d*Math.min(1,dt*12);ph+=sp*dt*2.2;{const sn=Math.floor(ph/Math.PI);if(sn!=lastSn){lastSn=sn;sfx('step',run,S.in)}}anim(pl,ph,.7,sp);if(run)S.en=clamp(S.en-dt*.5,0,100)}else anim(pl,0,0);
 const B=S.in?CI:CO;for(let k=0;k<2;k++)for(const b of B){const cx=clamp(P.x,b.x1,b.x2),cz2=clamp(P.z,b.z1,b.z2),ex=P.x-cx,ez=P.z-cz2,d2=ex*ex+ez*ez;if(d2<.1225){if(d2>1e-6){const d=Math.sqrt(d2),q=(.35-d)/d;P.x+=ex*q;P.z+=ez*q}else P.x=b.x1-.35}}
 if(S.in){P.x=clamp(P.x,-3.3,3.3);P.z=clamp(P.z,-302.6,-297.5)}
 /* время и потребности */
 const dm=dt*(S.fx>0?2.5:1);S.min+=dm;S.sat=clamp(S.sat-.07*dm,0,100);S.en=clamp(S.en-.04*dm,0,100);
 if(S.sat<15)S.str+=.1*dm;if(S.en<15)S.str+=.08*dm;S.str+=S.add*.002*dm;if(!S.add)S.str+=(25-S.str)*.0005*dm;S.str=clamp(S.str,0,100);
-if(S.fx>0){S.fx-=dt;if(S.fx<=0){S.fx=0;chg({str:22,en:-18,trust:-6});msg('Кира','Ты где? Ты странный по сообщениям.');toast('Эффект проходит. Остаются тревога и пустота.')}}
+if(S.fx>0){S.fx-=dt;if(S.fx<=0){S.fx=0;S.cd=50;sfx('fxOff');chg({str:22,en:-18,trust:-6,self:-5});msg('Кира','Ты где? Ты странный по сообщениям.');toast('Эффект проходит. Остаются тревога, звон в ушах и пустота.')}}
 if(S.f.acc&&S.add>=15&&!S.f.crave&&S.fx==0&&S.min%1440>1080){S.f.crave=1;msg('Артём','Если что, я на месте. Для своих скидка.')}}
 /* камера */
 pl.position.copy(P);pl.visible=true;pl.rotation.y=pl.rotation.y;
 const dist=S.in?2.4:5.2,ph2=pitch;let sc=1,cx,cy,cz;
 for(let k=0;k<6;k++){cx=P.x-Math.sin(yaw)*Math.cos(ph2)*dist*sc;cz=P.z-Math.cos(yaw)*Math.cos(ph2)*dist*sc;cy=1.6+Math.sin(ph2)*dist*sc+.3;if(S.in||!CO.some(b=>cx>b.x1&&cx<b.x2&&cz>b.z1&&cz<b.z2&&cy<b.h))break;sc-=.17}
 if(S.in){cx=clamp(cx,-3.4,3.4);cz=clamp(cz,-302.7,-297.3);cy=Math.min(cy,2.5)}
-cam.position.set(cx,Math.max(.4,cy),cz);cam.lookAt(P.x,1.4,P.z);
+cam.position.set(cx,Math.max(.4,cy),cz);cam.lookAt(P.x,1.4,P.z);cam.rotateZ(Math.sin(t*.9)*.06*FXI+Math.sin(t*35)*.004*CDI);
 /* NPC и маркеры */
-kira.visible=S.step==3||S.step==6||(S.step==9&&S.f.route!='bad');kira.rotation.z=Math.sin(t*1.1)*.012;artem.visible=!S.in&&true;if(kira.visible)kira.rotation.y=Math.atan2(P.x-kira.position.x,P.z-kira.position.z);artem.rotation.y=Math.atan2(P.x-artem.position.x,P.z-artem.position.z)*(Math.hypot(P.x-artem.position.x,P.z-artem.position.z)<25?1:0)+(Math.hypot(P.x-artem.position.x,P.z-artem.position.z)<25?0:Math.PI);
+kira.visible=S.step==3||S.step==6||S.step==11||S.step==12||S.step==13||(S.step==9&&S.f.route!='bad');kira.rotation.z=Math.sin(t*1.1)*.012;artem.visible=!S.in&&true;if(kira.visible)kira.rotation.y=Math.atan2(P.x-kira.position.x,P.z-kira.position.z);artem.rotation.y=Math.atan2(P.x-artem.position.x,P.z-artem.position.z)*(Math.hypot(P.x-artem.position.x,P.z-artem.position.z)<25?1:0)+(Math.hypot(P.x-artem.position.x,P.z-artem.position.z)<25?0:Math.PI);
 const tg=tgt();beacon.visible=!!tg&&!busy;if(tg)beacon.position.set(tg[0],20,tg[1]);
 const a=!busy&&near();$('pr').hidden=!a;if(a)$('pr').textContent=(document.body.classList.contains('touch')?'':'E · ')+a.l();
 hudT+=dt;if(hudT>.25){hudT=0;$('b1').style.width=S.sat+'%';$('b2').style.width=S.en+'%';$('b3').style.width=S.str+'%';$('tm').innerHTML=`<span>${clk()}</span>День ${Math.floor(S.min/1440)+1} · ${Math.round(S.money)} ₽`;$('obj').textContent=OBJ[S.step];if(S.step==0&&!S.msgs.length)0;if(!(Math.floor(t)%10))save()}
 env(dt,t)}
+/* ===== пост-обработка: эффект веществ и «отходняк» ===== */
+const PP={on:false};
+try{const mk=()=>{const r=new THREE.WebGLRenderTarget(4,4,{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter,format:THREE.RGBAFormat});r.texture.encoding=THREE.sRGBEncoding;return r};
+PP.a=mk();PP.h0=mk();PP.h1=mk();PP.cam=new THREE.OrthographicCamera(-1,1,1,-1,0,1);PP.sc=new THREE.Scene();
+const vs='varying vec2 v;void main(){v=uv;gl_Position=vec4(position.xy,0.,1.);}';
+PP.m=new THREE.ShaderMaterial({uniforms:{t:{value:0},tx:{value:null},hist:{value:null},fx:{value:0},cd:{value:0},asp:{value:1}},vertexShader:vs,depthTest:false,depthWrite:false,fragmentShader:`
+uniform sampler2D tx,hist;uniform float t,fx,cd,asp;varying vec2 v;
+vec3 hue(vec3 c,float a){vec3 k=vec3(.57735);float ca=cos(a),sa=sin(a);return c*ca+cross(k,c)*sa+k*dot(k,c)*(1.-ca);}
+void main(){vec2 uv=v,c=uv-.5;float r=length(c);
+uv+=c*(sin(t*.9)*.035*fx)+fx*.012*vec2(sin(uv.y*16.+t*1.8),cos(uv.x*13.+t*1.5));
+uv+=cd*.0025*vec2(sin(t*41.),cos(t*37.));
+float ab=(.007*fx+.004*cd)*(.5+r);vec3 col;
+col.r=texture2D(tx,uv+c*ab*2.).r;col.g=texture2D(tx,uv).g;col.b=texture2D(tx,uv-c*ab*2.).b;
+float bl=.012*fx*(.4+r*1.6);vec3 s=vec3(0.);
+for(int i=0;i<8;i++){float a=float(i)*.785+t*.3;s+=texture2D(tx,uv+vec2(cos(a)/asp,sin(a))*bl).rgb;}
+s/=8.;col=mix(col,s,clamp(fx*.7,0.,.75));col+=(s-.35)*fx*.3;
+vec3 h=texture2D(hist,v+c*.004*fx).rgb;col=mix(col,max(col,h*.97),fx*.6);
+col=hue(col,sin(t*.4)*1.3*fx);
+float l=dot(col,vec3(.299,.587,.114));col=mix(vec3(l),col,1.+fx*.9-cd*.95);
+col*=1.-cd*.12;
+float vg=smoothstep(.85,.2,r*(1.+fx*.5+cd*.9));col*=mix(1.,vg,.55*fx+.7*cd);
+col*=1.+.07*sin(t*(2.+5.*fx))*fx;
+gl_FragColor=vec4(col,1.);}`});
+PP.cp=new THREE.ShaderMaterial({uniforms:{tx:{value:null}},vertexShader:vs,depthTest:false,depthWrite:false,fragmentShader:'uniform sampler2D tx;varying vec2 v;void main(){gl_FragColor=texture2D(tx,v);}'});
+PP.q=new THREE.Mesh(new THREE.PlaneGeometry(2,2),PP.m);PP.q.frustumCulled=false;PP.sc.add(PP.q);PP.on=true}catch(e){PP.on=false;console.warn('post',e)}
+function ppResize(){if(!PP.on)return;const s=R.getDrawingBufferSize(new THREE.Vector2());[PP.a,PP.h0,PP.h1].forEach(r=>r.setSize(s.x,s.y));PP.m.uniforms.asp.value=s.x/s.y}
+function draw(t,dt){FXI+=((S.fx>0?1:0)-FXI)*Math.min(1,dt*(S.fx>0?.5:.3));CDI+=((S.cd>0?1:0)-CDI)*Math.min(1,dt*.5);
+if(PP.on&&(FXI>.01||CDI>.01)){try{const u=PP.m.uniforms;u.t.value=t;u.fx.value=FXI;u.cd.value=CDI;
+R.setRenderTarget(PP.a);R.render(scene,cam);u.tx.value=PP.a.texture;u.hist.value=PP.h0.texture;PP.q.material=PP.m;R.setRenderTarget(PP.h1);R.render(PP.sc,PP.cam);
+PP.cp.uniforms.tx.value=PP.h1.texture;PP.q.material=PP.cp;R.setRenderTarget(null);R.render(PP.sc,PP.cam);const x=PP.h0;PP.h0=PP.h1;PP.h1=x;return}catch(e){PP.on=false;R.setRenderTarget(null)}}
+R.render(scene,cam)}
 let last=0;
-function loop(ts){requestAnimationFrame(loop);const t=ts/1000,dt=Math.min(.05,t-last);last=t;if(started&&!paused)update(dt,t);else if(started){env(0,t)}R.render(scene,cam)}
-function resize(){R.setSize(innerWidth,innerHeight,false);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()}
+function loop(ts){requestAnimationFrame(loop);const t=ts/1000,dt=Math.min(.05,t-last);last=t;if(started&&!paused)update(dt,t);else if(started){env(0,t)}draw(t,dt)}
+function resize(){R.setSize(innerWidth,innerHeight,false);ppResize();cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()}
 addEventListener('resize',resize);resize();
 /* ===== старт ===== */
 pl.position.copy(P);if(S.in)S.in=1;
