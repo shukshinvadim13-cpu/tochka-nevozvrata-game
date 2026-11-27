@@ -510,10 +510,10 @@ else if(c==1){chg({trust:-9,str:5});S.f.refmoney=1;await ask('Кира','Пон�
 else{chg({str:5});await ask('Кира','Буду ждать. До вечера.')}
 kira.visible=false;S.step=7;msg('Артём','Есть разговор и есть деньги. Гаражи. Сегодня.')}
 async function talkArtem2(){
-await ask('Артём',S.f.acc?'С тебя за прошлый раз полторы тысячи. Или отработаешь: один свёрток, соседний двор, пять минут.':'Слышал, тебе нужны деньги. Один свёрток, соседний двор, пять минут. Пять тысяч.');
+await ask('Артём',S.f.acc?(S.f.debt=1500,'Бесплатно было только вчера. Теперь ты в списке должников: полторы тысячи. Или отработаешь: один свёрток, соседний двор, пять минут.'):'Слышал, тебе нужны деньги. Один свёрток, соседний двор, пять минут. Пять тысяч.');
 let c=await ask('Вадим','Пять тысяч — это лекарства, долг и неделя нормальной еды.',['Согласиться.','Спросить, что внутри.','Отказаться и уйти.']);
 if(c==1){await ask('Артём','Меньше знаешь — крепче спишь. Ну? Да или нет.');c=await ask('Вадим','Он не отводит взгляд. Это не шутка.',['Согласиться.','Отказаться и уйти.']);c=c==0?0:2}
-if(c==0){S.f.courier=1;S.money+=5000;chg({rep:-10,str:12,trust:-4});if(S.f.acc)S.add=clamp(S.add+4,0,100);await ask('','Свёрток тяжелее, чем выглядел. Ты отдал его чужому человеку у подъезда и не оглянулся. Пять тысяч лежат в кармане и жгут руку.')}
+if(c==0){S.f.courier=1;S.f.debt=0;S.money+=5000;chg({rep:-10,str:12,trust:-4});if(S.f.acc)S.add=clamp(S.add+4,0,100);await ask('','Свёрток тяжелее, чем выглядел. Ты отдал его чужому человеку у подъезда и не оглянулся. Пять тысяч лежат в кармане и жгут руку.')}
 else{chg({rep:3,str:-3});await ask('Артём','Зря. Предложение живёт до вечера. Передумаешь — знаешь, где меня искать.');await ask('','Ты уходишь, не оборачиваясь. Спина мокрая, хотя на улице минус семнадцать.')}
 S.step=8;msg('Кира',S.f.gave?'Бабушке уже лучше. Спасибо тебе. Ты дома?':'Ты дома? Напиши, как будешь.')}
 async function ending2(){const bad=S.f.courier&&(S.f.hide||S.trust<45),good=!S.f.courier&&S.trust>=55&&!S.f.hide;
@@ -591,7 +591,7 @@ await ask('Макс','Да забирай свою истеричку. Целу�
 await ask('','Друзья Киры переглядываются. Кира бледнеет: она слышит, как о ней говорят при всех.');
 await ask('Кира','(севшим голосом) «Таких»?.. Макс, ты это серьёзно?');
 await ask('Макс','Да не делай лицо, Кир. Все же в курсе.');
-await ask('','Кира сбрасывает его руку, достаёт телефон и стирает его номер при всех. Пальцы дрожат. Она плачет и не прячется.');
+await ask('','Кира сбрасывает его руку, достаёт телефон и стирает его номер при всех. Пальцы дрожат. Она плачет и не прячется.');await ask('Макс','(шипит) Ты ещё пожалеешь, Кира. У меня есть знакомые, которым такие истории очень интересны.');
 await ask('Кира','Вадим… пожалуйста, подожди. Мне нужно тебе кое-что сказать.');
 S.step=13;msg('Кира','Лавочка во дворе. Я приду. Дай мне объясниться.')}
 async function talkKira4c(){let c;
@@ -637,7 +637,7 @@ await ask('Артём',S.f.uses?'О, свой человек. Что сегод�
 const ks=['st','ch','sm'],c=await ask('Вадим','У тебя '+Math.round(S.money)+' ₽.',ks.map(k=>SUB[k].n).concat(['Уйти.']));if(c>2)return;
 const b=SUB[ks[c]];if(S.money<b.p){if((S.f.debt||0)>4000){await ask('Артём','Ты и так должен. Сначала долг.');return}const cc=await ask('Артём','Денег нет? В долг дам. Вернёшь ×1.5.',['Взять в долг.','Уйти.']);if(cc)return;S.f.debt=(S.f.debt||0)+Math.round(b.p*1.5);S.money+=b.p;S.f.dd=0;msg('Артём','Записал: '+S.f.debt+' ₽. Срок неделя.')}
 S.money-=Math.round(b.p*(1+(S.tol||0)/100));S.f.uses=(S.f.uses||0)+1;sfx('coin');
-if(S.fx>0||S.cd>0){await fade('Ты принимаешь, пока прошлое не отпустило…',()=>{S.fx=0;S.cd=0;S.in=1;P.set(1.2,0,-299.6);S.min+=480;S.add=clamp(S.add+10,0,100);chg({trust:-15,self:-15,en:-40,str:20,rep:-5})});
+if(S.fx>0||S.cd>0){await fade('Ты принимаешь, пока прошлое не отпустило…',()=>{S.fx=0;S.cd=0;S.f.od=1;S.in=1;P.set(1.2,0,-299.6);S.min+=480;S.add=clamp(S.add+10,0,100);chg({trust:-15,self:-15,en:-40,str:20,rep:-5})});
 await ask('','Ты приходишь в себя дома. Во рту горько, руки не слушаются. Ты чудом не остался на морозе.');msg('Кира','Мне звонил твой сосед: тебя нашли у подъезда. Ты вообще понимаешь, что мог не проснуться?');return}
 S.f.acc=1;S.tol=clamp((S.tol||0)+7,0,100);S.hp=clamp((S.hp==null?100:S.hp)-6-S.tol*.06,0,100);S.add=clamp(S.add+b.add+S.f.uses,0,100);startFx(b.fx*Math.max(.5,1-.1*(S.f.uses-1))*(1-S.tol/200));chg({en:b.en,self:b.self,str:6});
 await ask('','Эффект приходит волной. С каждым разом всё слабее, а платить приходится всё больше.')}
@@ -666,14 +666,14 @@ const TIM=person({top:0x15151a,leg:0x1d1d22,skin:0xc99a7c,hair:0x0e0e0e,shoe:0x1
 async function talkTimur(){let c;
 await ask('','Тимур совсем не такой, как рисует воображение. Спокойный, в чистом чёрном пальто, пьёт чай из термоса. Только глаза не мигают.');
 await ask('Тимур',S.f.deep?'Долг закрыт, уважаю. Но ты видел лица, адреса, схему. Такие, как ты, либо с нами, либо молчат очень громко.':'Ты чистый. Редкость. А чистые бывают очень полезны.');
-await ask('Тимур','Мне нужен человек, которого никто не знает. Просто ходить. Пять тысяч в неделю. И ещё: у тебя милая Кира. Береги её.');
+await ask('Тимур','Про Киру мне рассказал твой знакомый Макс. Обиженные люди очень разговорчивы.');await ask('Тимур','Мне нужен человек, которого никто не знает. Просто ходить. Пять тысяч в неделю. И ещё: у тебя милая Кира. Береги её.');
 c=await ask('Вадим','Угроза прозвучала так буднично, что от этого страшнее.',['«Тронешь Киру, пойду в полицию».','«Я подумаю». Потянуть время.','«Я в деле».']);
 if(c==0){chg({self:10,str:12,rep:3});S.f.report=1;await ask('Тимур','(улыбается) Смелый. Иди. Посмотрим, хватит ли смелости на второй раз.')}
 else if(c==1){chg({str:8});S.f.stall=1;await ask('Тимур','Три дня. Потом я перестану быть вежливым.')}
 else{S.f.deep=1;S.f.timur=1;S.money+=2000;chg({rep:-12,str:15,self:-8,add:3});await ask('Тимур','Правильный выбор. Это задаток.')}
 S.step=22;msg('Кира','Вадь, мне написал незнакомый номер: «береги себя, Вадим хороший». Что происходит? Выйди во двор.')}
 async function talkKira6(){let c;
-await ask('Кира','Он знает моё имя, знает, где я живу. Это из-за тебя? Только честно.');
+await ask('Кира','Он знает моё имя, знает, где я живу. Это из-за тебя? Или это Макс? Он клялся, что я пожалею. Только честно.');
 c=await ask('Вадим','Она смотрит прямо. Врать уже нет сил.',['Рассказать всё и попросить помощи.','«Просто ошибся номером».','«Не лезь, я сам».']);
 if(c==0){S.f.help=1;chg({trust:8,self:5,love:3,str:-8});await ask('Кира','Тогда идём в центр. Сергей знает юриста. И я с тобой. Не рядом, а с тобой.')}
 else if(c==1){chg({trust:-8,str:8});await ask('Кира','Хорошо. Но я больше не буду закрывать глаза.')}
@@ -714,7 +714,7 @@ await ask('','Кира написала «береги себя» и больш�
 await ask('','И каждый день решаешь заново. Выход никогда не закрывается совсем. Это и есть самое трудное.')}
 else{await ask('','Всё не исправилось, но и не рухнуло. Ты ходишь в центр по четвергам, работаешь, иногда молчишь рядом с Кирой на лавочке.');
 await ask('Кира','Не знаю, что у нас будет. Но я хочу узнать. Если ты тоже.')}
-await v2Ending();await ask('','Игра продолжается в свободном режиме.')}
+await v2Fate();await ask('','Игра продолжается в свободном режиме.')}
 IA.unshift({in:1,x:0,z:-297.7,r:2,l:()=>'Календарь: дожить до весны (эпилог)',ok:()=>S.step==20&&!S.f.ep,fn:spring});
 /* ===== люди: оживление, одежда, прохожие, небо ===== */
 winter(artem,0x4a4a3a,0x333333,0x1c1c1c);winter(MAX,0x7a2a2a,0xdddddd,0x2a2a2a);winter(TIM,0x15151a,0x555555,0x15151a);
@@ -748,7 +748,7 @@ else{const c=await ask('Вадим','Руки дрожат, но телефон 
 await fade('',()=>{S.in=1;P.set(1.2,0,-299.6);toTime(23)});
 const ar=!S.f.dark&&(S.f.testify||S.f.photo);
 await ask('',ar?'Утром звонок от Марины: машину нашли, Тимура задержали. Артём исчез. Двор снова похож на двор.':S.f.dark?'Ты лежишь в темноте без телефона. Завтра в шесть. Выхода всё меньше.':'Ночь без сна. Тимур на свободе, и ты это знаешь.');
-if(ar)chg({trust:6,self:8,str:-15,rep:5});
+if(ar){S.f.tDown=1;chg({trust:6,self:8,str:-15,rep:5})}
 await ask('Итоги главы 7',ar?'Финал: честный. Страшно, но ты не один.':S.f.dark?'Финал: тёмный. Ты внутри системы.':'Финал: открытый. Опасность не ушла.');
 await ask('','Конец главы 7. Дальше свободная игра: подработки, вечера с Кирой, центр. Продолжение следует.');S.step=20;toast('Свободная игра')}
 IA.unshift({in:0,x:-92,z:82,r:2.8,l:()=>'Поговорить с Тимуром',ok:()=>S.step==24&&!!S.f.timur,fn:talk7a},
@@ -816,8 +816,8 @@ if(out){if(Math.hypot(P.x+58,P.z-71.5)<16&&Math.random()<dt*3)sfx('crack');if(nt
 /* ===== Глава 5 · «Расплата» ===== */
 async function talkArtem5(){const dirty=S.f.courier||S.f.deep||S.f.uses||S.f.acc||S.f.relapse;
 if(!dirty){await ask('Артём','Ты чистый, Вадя. Скучный, но чистый. Тимур спрашивал про тебя: кто видел гаражи, тот молчит. Понял?');chg({self:3,str:4});await ask('','Ты киваешь. Дальше эта дверь для тебя закрыта, и ты этому рад.');S.step=17;return}
-S.f.debt=S.f.courier||S.f.deep?4000:2500;
-await ask('Артём','Вадя, без обид. Тимур считает. '+(S.f.courier||S.f.deep?'Свёрток помнишь? ':'Товар в долг — это тоже долг. ')+S.f.debt+' ₽. Сегодня.');
+S.f.debt=Math.max(1000,(S.f.courier||S.f.deep?4000:2500)-(S.f.paid?3000:0));
+await ask('Артём','Вадя, без обид. Тимур считает. '+(S.f.courier||S.f.deep?'Свёрток помнишь? ':'Товар в долг — это тоже долг. ')+S.f.debt+' ₽. Сегодня. И Макс про тебя расспрашивал: обиженный человек очень разговорчив.');
 const c=await ask('Вадим','Руки ледяные, хотя ты в пуховике.',['«Деньги будут. Дай время».','«Я тебе ничего не должен».','«Давай ещё один заход, закрою долг».']);
 if(c==0){chg({str:4});await ask('Артём','Принеси сегодня. Иначе Тимур придёт сам.');S.step=16}
 else if(c==1){chg({self:6,str:10,rep:2});await ask('Артём','(тихо) Это ты Тимуру скажешь. Лучше принеси деньги.');S.step=16}
@@ -831,7 +831,7 @@ async function ending5a(){await ask('','Долг закрыт, телефон м
 await ask('Кира','Сегодня центр. Я у входа, справа за магазином. Приходи, когда будешь готов. Я никуда не тороплюсь.');
 S.step=18;toast('Сегодня: центр помощи')}
 async function talkCenter(){let c;
-await ask('Кира',S.f.cond?'Ты пришёл. Я боялась, что нет.':'Ты пришёл. Я сама не верила.');
+await ask('Кира',S.f.center?'Мы собирались сюда ещё в ту пятницу, но жизнь вмешалась. Главное, что ты пришёл сейчас.':S.f.cond?'Ты пришёл. Я боялась, что нет.':'Ты пришёл. Я сама не верила.');
 await ask('','Внутри пахнет чаем и линолеумом. Психолог Лена в свитере не задаёт лишних вопросов, просто показывает на круг стульев.');
 c=await ask('Вадим','Ладони мокрые. Дверь ещё открыта.',['Сесть в круг.','«Я подожду снаружи».','Развернуться и уйти.']);
 if(c==2){chg({self:-4,trust:-4,str:6});await ask('Кира','(тихо) Хорошо. Я не буду тебя тащить.')}
@@ -860,24 +860,24 @@ $('mres').onclick=()=>menu(false);$('msave').onclick=()=>{save();toast('Сохр
 $('munst').onclick=()=>{if(S.in){P.set(1.2,0,-299.6)}else{P.set(-30,0,-1.2)}yaw=0;menu(false);toast('Вы перемещены')};
 $('mq').textContent='Графика: '+QS.n;$('mq').onclick=()=>{const k=Object.keys(QL);QK=k[(k.indexOf(QK)+1)%3];QS=QL[QK];localStorage.setItem('tn_q',QK);localStorage.setItem('tn_qm',1);$('mq').textContent='Графика: '+QS.n;applyQ();toast('Качество: '+QS.n)};
 $('mw').onclick=()=>{const o=[null,'snow','rain','fog'],n=['авто','снег','дождь','туман'];let i=(o.indexOf(W.lock)+1)%4;W.lock=o[i];$('mw').textContent='Погода: '+n[i]};
-$('mnew').onclick=()=>{if(confirm('Стереть прогресс?')){localStorage.removeItem(K);location.reload()}};
+$('mnew').onclick=()=>{if(confirm('Начать заново? Старое сохранение останется в резервной копии.')){try{localStorage.setItem(K+'_old',localStorage.getItem(K)||'')}catch(e){}localStorage.removeItem(K);location.reload()}};
 $('bP').onclick=openPhone;
 $('mmus').textContent='Музыка: '+(MUS.on?'вкл':'выкл');$('mmus').onclick=()=>{MUS.on=!MUS.on;localStorage.setItem('tn_m',MUS.on?'1':'0');$('mmus').textContent='Музыка: '+(MUS.on?'вкл':'выкл')};
 /* ===== ввод ===== */
-addEventListener('keydown',e=>{keys[e.code]=1;if(!started)return;if(e.code=='Escape'){menu(!paused)}else if(e.code=='KeyE')act();else if(e.code=='KeyP')$('phone').hidden?openPhone():$('pclose').onclick();
+addEventListener('keydown',e=>{keys[e.code]=1;if(!started)return;if(e.code=='Escape'){menu(!paused)}else if(e.code=='KeyE'){if(!e.repeat)act()}else if(e.code=='KeyP')$('phone').hidden?openPhone():$('pclose').onclick();
 else if(!$('dlg').hidden){const b=$('dc').children,n=e.code.startsWith('Digit')?+e.code.slice(5)-1:(b.length==1&&(e.code=='Enter'||e.code=='Space'))?0:-1;if(b[n])b[n].click()}});
 addEventListener('keyup',e=>keys[e.code]=0);
 document.addEventListener('pointerlockchange',()=>{if(!document.pointerLockElement&&started&&!paused&&!busy)menu(true)});
 const rot=(dx,dy)=>{yaw-=dx*.0035;pitch=clamp(pitch+dy*.003,-.15,1.1)};
-let cid=null,cl=null;
+let cid=null,cl=null,VX=0,VZ=0;
 cvs.addEventListener('pointerdown',e=>{if(e.pointerType=='mouse'){if(!paused&&!busy)cvs.requestPointerLock&&cvs.requestPointerLock()}else{cid=e.pointerId;cl=[e.clientX,e.clientY]}});
 cvs.addEventListener('pointermove',e=>{if(e.pointerType=='mouse'){if(document.pointerLockElement&&!paused)rot(e.movementX,e.movementY)}else if(e.pointerId==cid&&!paused){rot(e.clientX-cl[0],e.clientY-cl[1]);cl=[e.clientX,e.clientY]}});
 cvs.addEventListener('pointerup',e=>{if(e.pointerId==cid)cid=null});
 const zone=$('zone'),base=$('base'),knob=$('knob');let jid=null,jo=null;
 zone.addEventListener('pointerdown',e=>{jid=e.pointerId;zone.setPointerCapture(jid);jo={x:e.clientX,y:e.clientY};base.style.cssText=`display:block;left:${jo.x-55}px;top:${jo.y-55}px`});
-zone.addEventListener('pointermove',e=>{if(e.pointerId!==jid)return;let dx=e.clientX-jo.x,dy=e.clientY-jo.y;const l=Math.hypot(dx,dy),m=55;if(l>m){dx*=m/l;dy*=m/l}knob.style.transform=`translate(${dx}px,${dy}px)`;jx=dx/m;jy=-dy/m});
+zone.addEventListener('pointermove',e=>{if(e.pointerId!==jid)return;let dx=e.clientX-jo.x,dy=e.clientY-jo.y;const l=Math.hypot(dx,dy),m=55;if(l>m){dx*=m/l;dy*=m/l}knob.style.transform=`translate(${dx}px,${dy}px)`;const mg=Math.hypot(dx,dy)/m,cv2=mg<.12?0:Math.pow((mg-.12)/.88,1.2),ux=mg?dx/m/mg:0,uy=mg?dy/m/mg:0;jx=ux*cv2;jy=-uy*cv2});
 const jend=e=>{if(e.pointerId===jid){jid=null;jx=jy=0;base.style.display='none';knob.style.transform=''}};zone.addEventListener('pointerup',jend);zone.addEventListener('pointercancel',jend);
-$('bE').addEventListener('pointerdown',e=>{e.preventDefault();act()});
+$('bE').addEventListener('pointerdown',e=>{e.preventDefault();try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}act()});
 $('bR').addEventListener('pointerdown',e=>{e.preventDefault();runT=!runT;$('bR').style.borderColor=runT?'#e0a458':''});
 /* ===== обновление ===== */
 let hudT=0,fxPrev=0;
@@ -897,16 +897,16 @@ const sp=wt=='rain'?15:2.2;for(let i=0;i<QN;i++){const k=i*3;pp[k+1]-=(sp+(i%5)*
 if(pp[k]-P.x>30)pp[k]-=60;else if(pp[k]-P.x<-30)pp[k]+=60;if(pp[k+2]-P.z>30)pp[k+2]-=60;else if(pp[k+2]-P.z<-30)pp[k+2]+=60}pg.attributes.position.needsUpdate=true;pts.visible=!S.in;
 sfxEnv(t,wt,f);
 cvs.style.filter='none';
-DZ+=((!$('dlg').hidden?9:0)-DZ)*.05;cam.fov=60-DZ+Math.sin(t*1.3)*7*fx;cam.updateProjectionMatrix()}
+DZ+=((!$('dlg').hidden?9:0)-DZ)*.05;{const nf=60-DZ+Math.sin(t*1.3)*7*fx;if(Math.abs(nf-cam.fov)>.02){cam.fov=nf;cam.updateProjectionMatrix()}}}
 function update(dt,t){heroTick(dt);NPCM.forEach(x=>x.update(dt));NPC.forEach(g=>idle(g,t));extraTick(dt,t);
 if(!busy){const kx=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0),ky=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0);
 let ix=kx+jx,iy=ky+jy;const l=Math.hypot(ix,iy);if(l>1){ix/=l;iy/=l}
-const run=(keys.ShiftLeft||keys.ShiftRight||runT)&&l>.1&&S.en>5,sx=Math.sin(yaw),cz=Math.cos(yaw);let dx=sx*iy-cz*ix,dz=cz*iy+sx*ix;
+const run=(keys.ShiftLeft||keys.ShiftRight||runT||(jid!==null&&l>.96))&&l>.1&&S.en>5,sx=Math.sin(yaw),cz=Math.cos(yaw);let dx=sx*iy-cz*ix,dz=cz*iy+sx*ix;
 if(S.fx>0){dx+=Math.sin(t*1.7)*.25*Math.hypot(dx,dz);dz+=Math.cos(t*1.3)*.25*Math.hypot(dx,dz)}
-const sp=(run?5.2:2.5)*(S.en<12||S.hp<25||S.sat<8?.72:1),m=Math.hypot(dx,dz);
-if(m>.05){P.x+=dx*sp*dt;P.z+=dz*sp*dt;let d=Math.atan2(dx,dz)-pl.rotation.y;d=Math.atan2(Math.sin(d),Math.cos(d));pl.rotation.y+=d*Math.min(1,dt*12);ph+=sp*dt*2.2;{const sn=Math.floor(ph/Math.PI);if(sn!=lastSn){lastSn=sn;sfx('step',run,S.in)}}anim(pl,ph,.7,sp);if(run)S.en=clamp(S.en-dt*.5,0,100)}else anim(pl,0,0);
+const sp=(run?5.4:2.6)*(S.en<12||S.hp<25||S.sat<8?.72:1),m=Math.hypot(dx,dz);
+const kk2=1-Math.exp(-dt*(m>.05?9:15));VX+=(dx*sp-VX)*kk2;VZ+=(dz*sp-VZ)*kk2;const vs=Math.hypot(VX,VZ);if(vs>.12){P.x+=VX*dt;P.z+=VZ*dt;let d=Math.atan2(VX,VZ)-pl.rotation.y;d=Math.atan2(Math.sin(d),Math.cos(d));pl.rotation.y+=d*Math.min(1,dt*12);ph+=vs*dt*2.2;{const sn=Math.floor(ph/Math.PI);if(sn!=lastSn){lastSn=sn;sfx('step',run,S.in)}}anim(pl,ph,.7,vs);if(run&&m>.05)S.en=clamp(S.en-dt*.5,0,100)}else anim(pl,0,0);
 const B=S.in==2?CI2:S.in?CI:CO;for(let k=0;k<2;k++)for(const b of B){const cx=clamp(P.x,b.x1,b.x2),cz2=clamp(P.z,b.z1,b.z2),ex=P.x-cx,ez=P.z-cz2,d2=ex*ex+ez*ez;if(d2<.1225){if(d2>1e-6){const d=Math.sqrt(d2),q=(.35-d)/d;P.x+=ex*q;P.z+=ez*q}else P.x=b.x1-.35}}
-if(S.in==2){P.x=clamp(P.x,-4.6,4.6);P.z=clamp(P.z,-403.5,-396.6)}else if(S.in){P.x=clamp(P.x,-3.3,3.3);P.z=clamp(P.z,-302.6,-297.5)}
+if(S.in==2){P.x=clamp(P.x,-4.6,4.6);P.z=clamp(P.z,-403.5,-396.6)}else if(S.in){P.x=clamp(P.x,-3.3,3.3);P.z=clamp(P.z,-302.6,-297.5)}else{P.x=clamp(P.x,-185,185);P.z=clamp(P.z,-140,140)}
 /* время и потребности */
 const dm=dt*(S.fx>0?2:.6);S.min+=dm;S.sat=clamp(S.sat-.07*dm,0,100);S.en=clamp(S.en-.04*dm,0,100);
 if(S.sat<15)S.str+=.1*dm;if(S.en<15)S.str+=.08*dm;S.str+=S.add*.002*dm;if(!S.add)S.str+=(25-S.str)*.0005*dm;S.str=clamp(S.str,0,100);
@@ -985,12 +985,12 @@ let pMin=S.min,pF=0,tk=0;
 window.TRM=0;window.WD=0;
 window.workMul=()=>{let m=1;if(S.str>70)m-=.15;if(S.sat<20)m-=.1;if(S.aw>20)m-=.15;if(WD>.3)m-=.2;if(S.hp<40)m-=.1;if(S.fx>0)m-=.1;if(S.add<15&&S.str<40&&S.aw<14)m+=.1;return clamp(m,.5,1.15)};
 /* --- события --- */
-async function panic(){sfx('heart',.4);const c=await ask('','Сердце колотится, воздух не проходит в грудь. Руки онемели. Это паническая атака.',['Присесть и дышать медленно.','Написать Кире.','Терпеть и идти дальше.']);
+async function panic(){sfx('heart',.4);try{navigator.vibrate&&navigator.vibrate([80,60,80])}catch(e){}const c=await ask('','Сердце колотится, воздух не проходит в грудь. Руки онемели. Это паническая атака.',['Присесть и дышать медленно.','Написать Кире.','Терпеть и идти дальше.']);
 if(c==0){S.min+=20;chg({str:-18,en:-3});toast('Отпустило. Медленный выдох помогает.')}else if(c==1){chg({str:-12,love:2,trust:2});msg('Кира','Я рядом. Дыши со мной: вдох на четыре, выдох на шесть.')}else{S.hp=clamp(S.hp-5,0,100);chg({str:-4,self:-2});toast('Дотерпел. Телу это не понравилось.')}}
 async function micro(){await fade('Ты проваливаешься в сон на ходу…',()=>{S.min+=90;S.hp=clamp(S.hp-(S.in?3:10),0,100);chg({en:10,str:4});S.aw=Math.max(0,S.aw-3)});await ask('',S.in?'Очнулся на полу. Затёкла шея. Организм вырубил тебя сам.':'Ты очнулся на лавке, весь в инее. Больше нельзя так не спать.')}
 async function collapse(){S.f.col=(S.f.col||0)+1;await fade('Темнота…',()=>{S.fx=0;S.cd=0;S.in=1;P.set(1.2,0,-299.6);yaw=0;S.min+=600;S.hp=40;S.sat=Math.max(S.sat,35);S.en=45;S.money-=Math.min(S.money,400);chg({trust:-10,self:-8,str:10})});
 await ask('','Белый потолок, чужой голос: «Живой. Соседи нашли». Ты дома. Лекарства и такси ушли из твоих денег, а телу напоминание: оно не железное.');msg('Кира','Мне позвонили. Я приехала, ты спал. Нам надо серьёзно поговорить.');msg('Мама','Сынок, мы всё знаем. Приходи на кухню.');
-if(S.f.col>=3){S.f.dark=1;await ask('','Третий раз. Врач говорит без обиняков: следующего может не быть. Ты слушаешь и впервые не споришь.')}}
+if(S.f.col>=3){S.f.dark=1;S.f.od=1;await ask('','Третий раз. Врач говорит без обиняков: следующего может не быть. Ты слушаешь и впервые не споришь.')}}
 async function momFinds(){const c=await ask('Мама','Вадик, я нашла у тебя в куртке пакетик. Что это?',['Признаться: «Мне плохо, помоги».','Соврать: «Это не моё».','Накричать и уйти.']);
 if(c==0){S.f.momKnows=1;S.f.conf=1;chg({self:6,str:-10,trust:3});S.inv.kit++;await ask('Мама','Она долго молчит, потом обнимает. «Справимся. Я записала нас к врачу». На столе лежит аптечка.')}
 else if(c==1){S.f.lies=(S.f.lies||0)+1;chg({self:-6,str:8});await ask('Мама','«Ладно». Она не верит, но кивает. Ложь теперь лежит между вами третьим человеком.')}
@@ -1008,18 +1008,18 @@ else{if(rnd()<.4){S.hp=clamp(S.hp-5,0,100);chg({str:15});toast('Ушёл дво�
 async function evSerg(){let c=2;while(c==2){c=await ask('Серый','Вадь! Есть тема на ночь: отнести пакет. Полторы тысячи, без вопросов.',['Согласиться.','Отказаться.','Спросить, что внутри.']);if(c==2)await ask('Серый','Не спрашивай, не соврёшь. Да или нет?')}
 if(c==0){S.money+=1500;S.f.serg=(S.f.serg||0)+1;S.f.heat=(S.f.heat||0)+1;chg({rep:-6,self:-6,str:10});sfx('coin');await ask('','Пакет отнесён. Деньги в кармане. Внутри всё сжалось от понимания, что назад это не отыграть.')}
 else{S.f.sergRef=(S.f.sergRef||0)+1;chg({self:3,rep:1});await ask('Серый',S.f.sergRef>1?'Понял. Больше не позвоню.':'Ну как знаешь. Я ещё наберу.')}}
-const EV=[[()=>1,evCar],[()=>1,evFound],[()=>S.fx>0||S.cd>0||S.f.serg||S.f.courier||(S.f.debt>0),evPatrol],[()=>S.step>=5&&S.money<700&&S.f.sergRef!==2&&(S.f.serg||0)<3?2:0,evSerg]];
+const EV=[[()=>1,evCar],[()=>1,evFound],[()=>S.fx>0||S.cd>0||S.f.serg||S.f.courier||(S.f.debt>0),evPatrol],[()=>S.step>=15&&S.money<700&&S.f.sergRef!==2&&(S.f.serg||0)<3?2:0,evSerg]];
 function dayTick(){const f=S.f;
 if(S.step>=5&&S.add>=30){chg({trust:-2,love:-1});if(rnd()<.6)msg('Кира',pick(['Ты опять пропал. Я не злюсь. Я боюсь.','Ты звонил ночью и молчал. Что происходит?','Мама спросила, почему у тебя глаза такие. Я соврала.']))}
 if(f.nina&&!f.soup&&rnd()<.5){f.soup=1;S.inv.food++;msg('Баба Нина','Вадик, поставила тебе пирожков у двери. Ешь, совсем тощий.')}
-if(f.debt>0){f.debt+=Math.round(f.debt*.05);f.dd=(f.dd||0)+1;if(f.dd==3)msg('Артём','Срок поджимает, друг. Долг '+f.debt+' ₽.');if(f.dd==6)msg('Незнакомец','Тебя ищут. Лучше сам.');if(f.dd>=8){f.dd=0;run(beating)}
+if(f.debt>0){f.debt+=Math.round(f.debt*.05);f.dd=(f.dd||0)+1;if(f.dd==3)msg(S.f.tDown?'Неизвестный номер':'Артём','Срок поджимает, друг. Долг '+f.debt+' ₽.');if(f.dd==6)msg('Незнакомец','Тебя ищут. Лучше сам.');if(f.dd>=8){f.dd=0;run(beating)}
 if(f.courier&&!f.betrayed&&Math.floor(S.min/1440)>=8&&rnd()<.35){f.betrayed=1;f.heat=(f.heat||0)+2}}
 if((f.heat||0)>=3&&rnd()<.6)run(raid);
 if(S.add>=35&&!f.momKnows&&rnd()<.3)run(momFinds);
 if((f.lies||0)>=3&&!f.momKnows){f.momKnows=1;chg({trust:-12,self:-10});msg('Мама','Я проверила. Всё, что ты говорил, было неправдой. Больше я не буду спрашивать. Я буду ждать.')}
 if(!f.clean7&&f.acc&&S.lu>0&&S.add<20&&(S.min-S.lu)/60>168){f.clean7=1;chg({self:10,trust:8,love:4});msg('Кира','Семь дней. Я посчитала. Горжусь тобой. Приходи, я принесла тебе кое-что.');toast('Семь дней без употребления')}
-S.hp=clamp(S.hp,0,100)}
-async function jumped(){if(S.fx<=0){S.aw=0;S.hp=clamp(S.hp+(S.sat>25?(S.add>40?6:12):4),0,100);S.tol=clamp(S.tol-3,0,100)}}
+window.v2Day&&v2Day();S.hp=clamp(S.hp,0,100)}
+async function jumped(){if(S.fx<=0){S.aw=0;S.hp=clamp(S.hp+(S.sat>25?(S.add>40?6:12):4),0,100);S.tol=clamp(S.tol-3,0,100);window.v2Wake&&run(v2Wake)}}
 /* --- тик --- */
 function v2(dt){if(!started||paused||busy||S.step<1){TRM=0;return}
 const jump=S.min-pMin;pMin=S.min;if(jump>200)jumped();
@@ -1040,12 +1040,12 @@ if(S.hp<=0){S.hp=1;run(collapse)}
 TRM=clamp(w*1.6+(S.str>75?.6:0)+(S.sat<8?.4:0),0,2);
 const d=Math.floor(S.min/1440);if(S.dd==null)S.dd=d;if(d>S.dd){S.dd=d;dayTick()}
 if(!S.in&&S.step>=2&&S.min>(S.evT||0)){const h=(S.min%1440)/60;if(h>8&&h<23){S.evT=S.min+180+rnd()*240;const L=EV.map(e=>[e[1],e[0]()]).filter(e=>e[1]>0);if(L.length&&rnd()<.7)run(pick(L)[0])}}
-tk+=dt;if(tk>.3){tk=0;$('b4').style.width=S.hp+'%';const p=[];if(S.sat<20)p.push('Голод');if(S.str>75)p.push('Паника');if(w>.2)p.push('Ломка');if(S.aw>16)p.push('Недосып');if(S.fx>0)p.push('Под действием');else if(S.cd>0)p.push('Отходняк');if(S.hp<30)p.push('Плохо');if(S.f.debt>0)p.push('Долг');$('v2s').textContent=p.join(' · ')}}
+tk+=dt;if(tk>.3){tk=0;window.v2Tick&&v2Tick(w);$('b4').style.width=S.hp+'%';const p=[];if(S.sat<20)p.push('Голод');if(S.str>75)p.push('Паника');if(w>.2)p.push('Ломка');if(S.aw>16)p.push('Недосып');if(S.fx>0)p.push('Под действием');else if(S.cd>0)p.push('Отходняк');if(S.hp<30)p.push('Плохо');if(S.f.debt>0)p.push('Долг');$('v2s').textContent=p.join(' · ')}}
 const _ex=extraTick;extraTick=function(dt,t){_ex(dt,t);try{v2(dt)}catch(e){console.warn('v2',e)}};
 /* --- рюкзак и заказы --- */
 const SH=[['food','Доставка еды',280,'Сытость +45'],['kit','Аптечка',350,'Здоровье +30, стресс −5'],['tea','Термос чая',120,'Стресс −8, силы +5']];
-window.v2Render=()=>{const i=S.inv;$('v2c').innerHTML='<b>Рюкзак и заказы</b>'+`<div class="hint">Здоровье ${Math.round(S.hp)} · Толерантность ${Math.round(S.tol)} · Без сна ${Math.round(S.aw)} ч · Долг ${S.f.debt||0} ₽${S.f.clean7?' · Фишка: 7 дней':''}</div>`+
-SH.map(s=>`<button data-o="${s[0]}">Заказать: ${s[1]} — ${s[2]} ₽ <small>(${s[3]})</small></button>`).join('')+'<div class="hint">Что о тебе помнят:</div>'+mem().map(x=>`<div class="hint">• ${x}</div>`).join('')+'<div class="hint">Есть:</div>'+
+window.v2Render=()=>{const i=S.inv,f=S.f,H=[];const h=(c,t)=>{if(c)H.push(t)};h(f.acc,'Попробовал впервые у Артёма');h(f.refuse,'Отказал Артёму');h(f.gave,'Помог Кире деньгами');h(f.courier,'Отнёс свёрток');h(f.paid||f.out,f.out?'Вышел из дела':'Заплатил по счёту');h(f.center,'Договорился идти в центр');h(f.cond,'Поставил Кире условие про Макса');h(f.timur,'Взял задаток у Тимура');h(f.report,'Пригрозил полицией');h(f.testify,'Дал показания');h(f.serg,'Работал на Серого');h(f.col,'Были обмороки: '+f.col);h(f.clean7,'Продержался семь дней');$('v2c').innerHTML='<b>Рюкзак и заказы</b>'+`<div class="hint">Здоровье ${Math.round(S.hp)} · Толерантность ${Math.round(S.tol)} · Без сна ${Math.round(S.aw)} ч · Долг ${S.f.debt||0} ₽${S.f.clean7?' · Фишка: 7 дней':''}</div>`+
+(H.length?'<div class="hint">Хроника: '+H.join(' → ')+'</div>':'')+SH.map(s=>`<button data-o="${s[0]}">Заказать: ${s[1]} — ${s[2]} ₽ <small>(${s[3]})</small></button>`).join('')+'<div class="hint">Что о тебе помнят:</div>'+mem().map(x=>`<div class="hint">• ${x}</div>`).join('')+'<div class="hint">Есть:</div>'+
 `<button data-u="food">Съесть еду (${i.food||0})</button><button data-u="kit">Аптечка (${i.kit||0})</button><button data-u="tea">Чай (${i.tea||0})</button><button id="v2x">Назад</button>`};
 $('v2c').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.id=='v2x'){$('v2p').hidden=true;return}
 const o=b.dataset.o,u=b.dataset.u;if(o){const s=SH.find(x=>x[0]==o);if(S.money<s[2]){toast('Не хватает денег');return}S.money-=s[2];S.inv[o]=(S.inv[o]||0)+1;sfx('coin')}
@@ -1084,6 +1084,82 @@ if(gh>0){gh-=d;return}ga+=d;gn++;if(ga>4000){const avg=ga/gn;ga=0;gn=0;
 if(avg>27&&QK!='low'&&!localStorage.getItem('tn_qm')){QK=QK=='high'?'medium':'low';QS=QL[QK];localStorage.setItem('tn_q',QK);applyQ();gh=3000;toast('Графика снижена для плавности: '+QS.n)}}})();
 S.inv=Object.assign({food:0,kit:0,tea:0},S.inv);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)try{save()}catch(e){}});
+})();
+/* ===== 2.0: арка «Серый», сны, эпилог, пульс экрана ===== */
+(()=>{
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const st=document.createElement('style');st.textContent='@keyframes pls{0%,100%{opacity:.55}50%{opacity:1}}#vig{transition:box-shadow 1s}';document.head.appendChild(st);
+window.v2Tick=w=>{const a=clamp((S.str-60)/90+w*.5+(S.hp<30?.35:0)+(S.sat<8?.2:0),0,.75);const v=$('vig');v.style.boxShadow=a>.04?`inset 0 0 ${70+a*120}px rgba(150,20,25,${a})`:'none';v.style.animation=a>.25?`pls ${1.6-a}s infinite`:'none'};
+/* сны: память о поступках */
+window.v2Wake=async()=>{const f=S.f,L=[];
+if(f.courier)L.push('Тебе снится свёрток. Он тяжелеет с каждым шагом, и ты не помнишь, кому его несёшь.');
+if((f.lies||0)>0)L.push('Мама стоит в дверях и повторяет твою ложь слово в слово, медленно, как диктор.');
+if(f.col)L.push('Белый потолок. Кто-то считает вслух. Ты слышишь число и не можешь вспомнить, что оно значит.');
+if(f.debt>0)L.push('Во сне ты считаешь деньги, и сумма в руках всё время меньше нужной.');
+if(f.nina)L.push('Тебе снится лестница и тяжёлые сумки. Впервые за долгое время во сне нет страха.');
+if(f.clean7)L.push('Тебе снится утро. Просто утро, снег, чай. Просыпаться не хочется.');
+if(f.serg)L.push('Серый смеётся где-то в темноте двора и не называет, что было в пакете.');
+if(L.length&&Math.random()<.65){await ask('',pick(L));if(S.add>35&&!f.clean7){S.str=clamp(S.str+4,0,100)}}};
+/* арка «Серый» — скрытая, зависит от прошлых решений */
+async function sergFinale(){const f=S.f;f.sergEnd=1;
+await fade('Глубокая ночь. Телефон вибрирует…',()=>{S.in=1;P.set(1.2,0,-299.6);yaw=0;S.min+=120});
+await ask('Серый','Вадь, открой. Пожалуйста. Меня ищут. Один я не вытяну.');
+const c=await ask('','За дверью стоит человек, с которым ты когда-то делил парту. Руки у него трясутся.',['Впустить и спрятать.','Не открывать.','Позвонить в полицию.']);
+if(c==0){f.sergHid=1;await ask('Серый','Ты настоящий друг. Я утром всё объясню.');
+await fade('Утро…',()=>{S.min+=420;const l=Math.min(S.money,1200);S.money-=l;f.debt=(f.debt||0)+3000;f.heat=(f.heat||0)+1;chg({trust:-5,self:-6,str:12})});
+await ask('','Серого нет. Нет и денег из ящика. На столе остался пакет. Телефон вибрирует.');msg(S.f.tDown?'Неизвестный номер':'Артём','Мой товар у тебя. Серый кинул нас обоих. Вернёшь деньгами или отработаешь. Долг +3000.')}
+else if(c==1){f.sergLeft=1;chg({self:-8,str:8});await ask('','Шаги стихают. Утром ты узнаешь, что его нашли у соседнего подъезда. Живого, но не прежнего.');msg('Кира','Ты слышал? Про Серёжу. Мне страшно.')}
+else{f.sergPol=1;chg({rep:6,self:4,str:14,trust:3});f.heat=0;S.f.debt=Math.max(0,(f.debt||0)-1000);await ask('Полиция','Приняли. Выезжаем. Оставайтесь на месте.');msg(S.f.tDown?'Неизвестный номер':'Артём','Кто-то слил. Я запомню.')}}
+/* день: память персонажей и триггеры арок */
+window.v2Day=()=>{const f=S.f,d=Math.floor(S.min/1440);
+if(f.serg>=2&&d>=9&&!f.sergEnd&&!S.in&&S.step>=20)run(sergFinale);
+const M=[];
+if(f.gave)M.push(['Кира','Я помню, что ты отдал мне деньги, когда у самого было пусто. Не знаю, как это забыть.']);
+if(f.flowers)M.push(['Кира','Тюльпаны давно завяли, а я всё не выбрасываю.']);
+if(f.nina)M.push(['Баба Нина','Вадик, зайди, чаю налью. Ты ведь не чужой.']);
+if(f.courier&&S.trust<50)M.push(['Кира','Люди говорят, что ты возил что-то для Артёма. Скажи, что это неправда.']);
+if(f.col)M.push(['Мама','Я теперь каждую ночь слушаю, дышишь ли ты за стенкой.']);
+if(f.clean7)M.push(['Кира','Ты выглядишь иначе. Живее.']);
+if(M.length&&Math.random()<.5){const m=pick(M);msg(m[0],m[1])}};
+/* эпилог: несколько судеб */
+window.v2Fate=async function(){const f=S.f;let k;
+if(f.dark&&f.timur)k='system';else if(f.tDown&&(f.testify||f.photo))k='witness';else if((f.heat||0)>=3||f.arr)k='law';else if((f.debt||0)>3000)k='debt';else if((f.col||0)>=3||S.add>=70)k='lost';
+else if(f.clean7&&S.add<25&&S.trust>=45&&S.self>=45)k='redeem';else k='ice';
+const T={
+system:['Ты работаешь на Тимура уже три месяца. Деньги приходят вовремя, как зарплата, и от этого ещё страшнее.','Кира перестала писать после того дня, когда ты отдал телефон. Макс, из-за которого всё началось, давно забыл эту историю. Ты нет. Но дверь наружу всё ещё существует, пока ты способен её искать.'],
+witness:['Суд закончился. Тимур получил срок, Артём исчез, а Макса вызывали свидетелем: тот, кто хотел отомстить, теперь прятал глаза.','Тебе не стало легче сразу. Но по утрам ты просыпаешься без страха, что звонок означает беду. Кира держит тебя за руку. Это и есть твоя победа.'],
+law:['Повестка приходит в обычный вторник. Всё, что казалось мелочью, сложилось в одно дело.','Условный срок, штраф и взгляд мамы в коридоре суда. Кира пришла и ничего не сказала. Этого достаточно, чтобы понять, что ещё не всё потеряно.'],
+debt:['Долг давно перестал быть цифрой. Он стал адресом, по которому тебя находят.','Ты работаешь на тех, кому должен, и каждую ночь считаешь, сколько осталось. Счёт никогда не сходится. Но ты ещё дышишь, и пока это тоже выбор.'],
+lost:['Дни слипаются. Ты не помнишь, когда последний раз ел, не помнишь, кто звонил.','Кира стоит у двери и не стучит. Она просто сидит на лестнице до утра. Ты слышишь это сквозь дверь. Дверь можно открыть. Пока можно.'],
+redeem:['Семь дней стали четырнадцатью, потом месяцем. Тело вспоминает, каково это, когда ничего не болит.','Ты стоишь на остановке в пять утра, снег хрустит, телефон молчит, и впервые за долгое время тебе не страшно от тишины. Кира машет рукой издалека.'],
+ice:['Ты не упал и не выбрался. Идёшь по тонкому льду, и каждый день решает, выдержит ли он.','Будущее не обещает ничего. Но у тебя есть люди, которые ждут, и есть следующее утро.']};
+await fade('Прошло время…',()=>{});for(const x of T[k])await ask('',x);
+const n={system:'Судьба: внутри системы',witness:'Судьба: свидетель',law:'Судьба: закон',debt:'Судьба: долговая яма',lost:'Судьба: потерянный',redeem:'Судьба: искупление',ice:'Судьба: тонкий лёд'}[k];
+S.f.fate=k;await ask('Итог',n+' · Здоровье '+Math.round(S.hp)+' · Зависимость '+Math.round(S.add)+' · Доверие '+Math.round(S.trust)+'. Игра продолжается: всё ещё можно изменить.');msg('Игра',n,1)}
+})();
+/* ===== 2.0: новые локации и устойчивость ввода ===== */
+(()=>{
+const sn=MS(0xeef3f8,1);
+function shopB(x,z,w,d,h,col,name,bg){box(x,h/2,z,w,h,d,MS(col,.9),true,1);box(x,h+.15,z,w+.4,.3,d+.4,sn,false);
+const sg=new THREE.Mesh(new THREE.PlaneGeometry(Math.min(w,5),.9),new THREE.MeshBasicMaterial({map:tex(signC(name,512,90,56,bg,'#fff3c8'),1,1)}));sg.position.set(x,h-.55,z+d/2+.03);scene.add(sg);
+box(x,1.2,z+d/2+.04,Math.min(w-1,2.4),1.8,.06,new THREE.MeshBasicMaterial({color:0xffe2a8}),false)}
+shopB(-6,24,6,4,3.2,0x8aa0b0,'АПТЕКА','#1c5a4a');
+shopB(-14,35,3.4,2.4,2.8,0xb08a3a,'ШАУРМА','#6a2a1a');
+async function pharm(){const f=S.f;await ask('Фармацевт',f.pharm?'Снова вы. Что нужно?':'Добрый день. Что подсказать?');
+const c=await ask('Вадим','У тебя '+Math.round(S.money)+' ₽.',['Аптечка · 350 ₽','Тёплый чай и витамины · 120 ₽','Спросить совета','Уйти']);
+if(c==0||c==1){const p=c?120:350;if(S.money<p){await ask('','Не хватает денег.');return}S.money-=p;sfx('coin');if(c==0){S.inv.kit++;toast('Аптечка в рюкзаке')}else chg({str:-6,en:6,hp:6})}
+else if(c==2){f.pharm=1;chg({str:-3});const need=S.add>=30||f.acc;await ask('Фармацевт',need?'Сюда часто заходят такие же уставшие. За магазином есть центр, анонимно. Первый шаг всегда самый маленький.':'Спите и ешьте нормально. Организм не железный. Заходите, если что.');if(need&&!f.pharmTip){f.pharmTip=1;chg({self:2})}}}
+async function shaw(){const f=S.f;f.rus=f.rus||0;const free=f.rus>=3;
+await ask('Рустам',free?'О, постоянный! Чай сегодня за счёт заведения.':f.rus?'Опять ты. Как обычно?':'Свежая шаурма, горячая. Бери.');
+if((f.debt||0)>0&&Math.random()<.5)await ask('Рустам','Вчера двое про тебя спрашивали. Не моё дело, но будь осторожнее.');
+const c=await ask('Вадим','У тебя '+Math.round(S.money)+' ₽.',['Шаурма · 190 ₽','Чай · '+(free?'бесплатно':'40 ₽'),'Уйти']);
+if(c==2)return;const p=c?(free?0:40):190;if(S.money<p){await ask('Рустам','Ничего, потом занесёшь.');return}
+S.money-=p;f.rus++;sfx('coin');if(c==0)chg({sat:35,en:3,str:-2});else chg({sat:3,en:3,str:-3});toast(c?'Горячий чай':'Сытно')}
+IA.unshift({in:0,x:-6,z:27.6,r:2.3,l:()=>'Зайти в аптеку',ok:()=>S.step>=2&&hh()>=8&&hh()<22,fn:pharm},
+{in:0,x:-14,z:37.6,r:2.3,l:()=>'Шаурма Рустама',ok:()=>S.step>=2&&hh()>=10&&hh()<24,fn:shaw});
+/* устойчивость ввода */
+const clr=()=>{for(const k in keys)keys[k]=0;jx=jy=0;VX=VZ=0};
+addEventListener('blur',clr);document.addEventListener('visibilitychange',()=>{if(document.hidden)clr()});
 })();
 </script>
 </body></html>
