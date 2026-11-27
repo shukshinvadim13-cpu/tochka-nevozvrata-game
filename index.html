@@ -248,15 +248,17 @@ const hd=S(sp(.13),sk,0,1.74,0,g,1,1.16,1.06);S(sp(.024),sk,0,1.72,.14,g,1,1,1.3
 [-.046,.046].forEach(x=>{S(sp(.013),ey,x,1.755,.122);S(sp(.024),sk,x*2.9,1.74,0,g,.5,1,1)});
 const hair=new THREE.Mesh(sp(.142),hr);hair.geometry=new THREE.SphereGeometry(.142,18,14,0,Math.PI*2,0,Math.PI*.58);hair.position.set(0,1.745,-.012);hair.scale.set(1.03,1.14,1.1);hair.castShadow=true;g.add(hair);
 S(sp(.13),hr,0,o.long?1.62:1.72,-.075,g,1.05,o.long?2.4:1,.85);
+if(!o.long){[-.046,.046].forEach(x=>{S(sp(.021),M(0xf4f4f0,.3),x,1.756,.128,g,1,.75,.45);S(sp(.011),ey,x,1.756,.136,g,1,1,.5);S(new THREE.BoxGeometry(.05,.011,.012),hr,x,1.797,.131,g).rotation.z=x*1.2});S(new THREE.BoxGeometry(.05,.008,.01),M(0x8a4a48,.5),0,1.69,.131,g);S(sp(.12),hr,0,1.8,.05,g,1.05,.42,.85)}
+S(cy(.2,.2,.04),M(0x1a1a1a,.5),0,.99,0,g,1.15,1,.75);A.forEach(a=>S(cy(.062,.062,.05),lg,0,-.58,0,a));
 g.userData={L,A};scene.add(g);return g}
 let anim=(g,ph,a)=>{const u=g.userData;u.L[0].rotation.x=Math.sin(ph)*a;u.L[1].rotation.x=-Math.sin(ph)*a;u.A[0].rotation.x=-Math.sin(ph)*a*.8;u.A[1].rotation.x=Math.sin(ph)*a*.8};
 const pl=person({top:0x121316,leg:0x1c1f24,skin:0xd9a98a,hair:0x1c1511,shoe:0x2b2b2d});
-function winter(g){const M=c=>new THREE.MeshStandardMaterial({color:c,roughness:.85}),sp=r=>new THREE.SphereGeometry(r,16,12),cy=(a,b,h)=>new THREE.CylinderGeometry(a,b,h,18),jk=M(0x234a63),sc=M(0xb8473a),w=new THREE.Group();
+function winter(g,jc,sc2,hc){const M=c=>new THREE.MeshStandardMaterial({color:c,roughness:.85}),sp=r=>new THREE.SphereGeometry(r,16,12),cy=(a,b,h)=>new THREE.CylinderGeometry(a,b,h,18),jk=M(jc||0x234a63),sc=M(sc2||0xb8473a),w=new THREE.Group();
 const add=(geo,m,x,y,z,sx,sy,sz,p)=>{const b=new THREE.Mesh(geo,m);b.position.set(x,y,z);if(sx)b.scale.set(sx,sy,sz);b.castShadow=true;(p||w).add(b);return b};
 add(cy(.27,.25,.72),jk,0,1.2,0,1.2,1,.8);add(cy(.26,.3,.34),jk,0,.84,0,1.15,1,.85);
 for(let i=0;i<3;i++){const t=add(new THREE.TorusGeometry(.265,.012,6,24),M(0x173648),0,1.0+i*.2,0,1.2,.8,1);t.rotation.x=Math.PI/2}
 const tr=add(new THREE.TorusGeometry(.12,.05,10,20),sc,0,1.62,0,1.15,1,1);tr.rotation.x=Math.PI/2;
-add(sp(.15),M(0x26262b),0,1.77,-.005,1.05,.9,1.1);add(sp(.04),sc,0,1.92,0);
+add(sp(.15),M(hc||0x26262b),0,1.77,-.005,1.05,.9,1.1);add(sp(.04),sc,0,1.92,0);
 if(g.userData.A)g.userData.A.forEach(a=>add(cy(.085,.075,.56),jk,0,-.3,0,1,1,1,a));g.userData.coat=w;g.add(w)}
 winter(pl);
 const kira=person({top:0x3f5a50,leg:0x23262c,skin:0xe8b99c,hair:0x6b4a2f,shoe:0xdddddd,long:1});kira.position.set(5,0,35.4);
@@ -379,6 +381,9 @@ const hl=new THREE.Sprite(new THREE.SpriteMaterial({map:glowT,blending:THREE.Add
 const pl2=new THREE.PointLight(0xfff0c8,2,16);pl2.position.set(3,1,0);g.add(pl2);g.rotation.y=d>0?0:PI;g.position.set(x0,0,z);scene.add(g);cars.push({g,d,sp:9+R()*5})});
 let lt=performance.now();(function f(){requestAnimationFrame(f);const n=performance.now(),dt=Math.min(.05,(n-lt)/1000);lt=n;
 cars.forEach(c=>{c.g.position.x+=c.d*c.sp*dt;if(Math.abs(c.g.position.x)>230){c.g.position.x=-c.d*220;c.sp=9+R()*5}});fl.intensity=1.2+Math.random()*.9;fs.scale.setScalar(2.2+Math.random()*.6)})();
+box(62,2.5,22,12,5,7,MS(0x8a8f94,.9),true,1);box(62,5.15,22,12.6,.3,7.6,MS(0xeef3f8,1),false);box(62,1.2,25.55,1.6,2.4,.1,MS(0x3b5a4a,.6),false);
+const cs=new THREE.Mesh(new THREE.PlaneGeometry(7,1.1),new THREE.MeshBasicMaterial({map:tex(signC('ЦЕНТР ПОМОЩИ',512,80,50,'#2a5a52','#fff'),1,1)}));cs.position.set(62,4,25.56);scene.add(cs);
+[58.5,65.5].forEach(x=>box(x,2,25.54,1.8,1.4,.05,new THREE.MeshBasicMaterial({color:0xffd9a0}),false));
 })()}catch(e){console.warn('графика v2',e)}
 /* ===== погода и частицы ===== */
 const NP=2500,pp=new Float32Array(NP*3);for(let i=0;i<NP;i++){pp[i*3]=Math.random()*60-30;pp[i*3+1]=Math.random()*25;pp[i*3+2]=Math.random()*60-30}
@@ -441,7 +446,7 @@ if(!ind&&t>AU.carT){AU.carT=t+14+Math.random()*25;AU.car()}}
 /* ===== игровая логика ===== */
 let busy=false,paused=true,started=false,yaw=S.yaw||0,pitch=.35,jx=0,jy=0,runT=false,ph=0;
 const P=new THREE.Vector3(S.x,0,S.z),keys={};
-const OBJ=['Проверь телефон (📱 или P)','Выйди из квартиры','Купи еду в магазине','Встреться с Кирой на остановке','Найди Артёма у гаражей','Вернись домой и ляг спать','Глава 2 · Поговори с Кирой на остановке','Глава 2 · Найди Артёма у гаражей','Глава 2 · Вернись домой и ляг спать','Глава 3 · Утро. Найди нужного человека','Глава 3 · Вернись домой и ляг спать','Глава 4 · Приходи на остановку: Кира ждёт','Глава 4 · Вечером у магазина','Глава 4 · Кира ждёт на лавочке во дворе','Глава 4 · Вернись домой и ляг спать','Свободная прогулка. Продолжение следует'];
+const OBJ=['Проверь телефон (📱 или P)','Выйди из квартиры','Купи еду в магазине','Встреться с Кирой на остановке','Найди Артёма у гаражей','Вернись домой и ляг спать','Глава 2 · Поговори с Кирой на остановке','Глава 2 · Найди Артёма у гаражей','Глава 2 · Вернись домой и ляг спать','Глава 3 · Утро. Найди нужного человека','Глава 3 · Вернись домой и ляг спать','Глава 4 · Приходи на остановку: Кира ждёт','Глава 4 · Вечером у магазина','Глава 4 · Кира ждёт на лавочке во дворе','Глава 4 · Вернись домой и ляг спать','Глава 5 · Артём ждёт у гаражей: разговор','Глава 5 · Заработай и отдай долг Артёму','Глава 5 · Вернись домой и ляг спать','Глава 5 · Кира ждёт у центра помощи','Глава 5 · Вернись домой и ляг спать','Свободная игра · подработки, вечера с Кирой','Глава 6 · Тимур ждёт у промзоны','Глава 6 · Поговори с Кирой во дворе','Глава 6 · Вернись домой и ляг спать','Глава 7 · Вечером реши, к кому идти','Глава 7 · Вернись домой'];
 const hh=()=>(S.min/60)%24,pad=n=>String(Math.floor(n)).padStart(2,'0'),clk=()=>pad(hh())+':'+pad(S.min%60);
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>e.classList.remove('on'),4000)}
 function msg(f,t,quiet){S.msgs.unshift({f,t,h:clk()});if(!quiet){toast(f+': '+t);beep();$('bP').classList.add('dot')}}
@@ -457,12 +462,12 @@ if(S.step==2){S.step=3;msg('Кира','Я на остановке у твоег�
 async function work(){if(S.en<20){await ask('','Нет сил. Ноги едва держат.');return}
 const sc=await miniWork(),pay=150+sc*50;await fade('Смена на кассе и в зале пролетела…',()=>{S.min+=120;S.money+=pay;chg({en:-20,sat:-10,str:4,rep:2})});toast('Смена закончена: +'+pay+' ₽')}
 async function fridge(){await ask('','Холодильник почти пустой. На дверце записка: «Мы на смене. Не жди». Ты давно перестал ждать.');if(!S.f.note){S.f.note=1;S.money+=200;toast('Под запиской лежит 200 ₽')}}
-async function sleepAct(){const h=hh();if(S.en>80&&h>=7&&h<21&&S.step!=8&&S.step!=10&&S.step!=14){await ask('','Спать не хочется.');return}
+async function sleepAct(){const h=hh();if(S.en>80&&h>=7&&h<21&&S.step!=8&&S.step!=10&&S.step!=14&&S.step!=17&&S.step!=19&&S.step!=23){await ask('','Спать не хочется.');return}
 const bad=S.add>20;sfx('sleep');await fade('Ты проваливаешься в сон…',()=>{const m=S.min%1440;S.min=S.min-m+(m<420?420:1860);chg({en:bad?40:75,str:bad?8:-12,sat:-20})});
 if(bad)await ask('','Сон был рваным. Тело ломит, мысли возвращаются к одному и тому же.');
 if(S.step==5){await ask('',S.f.acc?'Ты лёг, но тревога не отпускала. Ты знаешь, чего тебе хочется, и это пугает.':S.f.callK?'Ты уснул с мыслью, что кому-то всё-таки не всё равно.':'Ты впервые за долгое время уснул без тяжести.');
 await ask('',S.trust>=55?'Кира ещё ответит тебе. Может быть.':'Кира всё реже отвечает. Между вами что-то треснуло.');
-await ask('','Конец главы 1. Твои решения сохранены и повлияют на историю дальше.');S.step=6;msg('Кира','Доброе утро. Если захочешь поговорить — я у остановки.');toast('Глава 2 · «Эхо»')}if(S.step==8)await ending2();if(S.step==10)await ending3();if(S.step==14)await ending4()}
+await ask('','Конец главы 1. Твои решения сохранены и повлияют на историю дальше.');S.step=6;msg('Кира','Доброе утро. Если захочешь поговорить — я у остановки.');toast('Глава 2 · «Эхо»')}if(S.step==8)await ending2();if(S.step==10)await ending3();if(S.step==14)await ending4();if(S.step==17)await ending5a();if(S.step==19)await ending5b();if(S.step==23)await ending6()}
 async function talkKira(){
 await ask('Кира','Ты со вчерашнего вечера молчишь. Я писала. Ты хоть читал?');
 let c=await ask('Вадим','Что ответить?',['Телефон сел. Прости, правда.','Ты тоже не рвалась звонить.','Пожать плечами и промолчать.']);
@@ -538,7 +543,7 @@ async function ending3(){await ask('',S.f.center?'Перед сном ты от�
 await ask('',S.f.deep?'Конец главы 3. Дорога назад становится всё уже. Продолжение: «Глава 4».':S.f.center?'Конец главы 3. У тебя есть план и человек, который идёт рядом. Продолжение: «Глава 4».':'Конец главы 3. Решения впереди. Продолжение: «Глава 4».');S.step=11;msg('Кира','Приходи утром на остановку. Нам надо поговорить. Одной мне не справиться.');toast('Глава 4 · «Шрамы»')}
 
 /* ===== Глава 4 · «Шрамы» и новые механики ===== */
-const KPOS={3:[5,35.4],6:[5,35.4],9:[5,35.4],11:[5,35.4],12:[19,6.5],13:[-20,4.2]};
+const KPOS={24:[64.5,28],20:[-20,4.2],22:[-20,4.2],18:[64.5,28],3:[5,35.4],6:[5,35.4],9:[5,35.4],11:[5,35.4],12:[19,6.5],13:[-20,4.2]};
 const MAX=person({top:0x2f4f6a,leg:0x20232a,skin:0xdcb08e,hair:0x3a2a1c,shoe:0xeeeeee});MAX.position.set(21,0,6.4);MAX.visible=false;
 function startFx(sec){S.fx=sec;S.cd=0;sfx('fxOn')}
 let HB=0,CRV=0;
@@ -546,7 +551,7 @@ function extraTick(dt,t){
 if(!busy&&!paused){HB-=dt;if(HB<0){const f=FXI>.3,h=S.str>82;HB=f?.85:h?1:2;if(f||h)sfx('heart',f?.34:.16)}
 if(S.cd>0)S.cd-=dt;
 if(S.add>=10&&S.fx<=0&&S.step>=5){CRV+=dt*(S.add>40?1.6:1);if(CRV>110){CRV=0;run(craving)}}}
-MAX.visible=S.step==12&&!S.in;if(MAX.visible)MAX.rotation.y=Math.atan2(P.x-MAX.position.x,P.z-MAX.position.z);
+TIM.visible=(S.step==21||(S.step==24&&S.f.timur))&&!S.in;if(TIM.visible)TIM.rotation.y=Math.atan2(P.x-TIM.position.x,P.z-TIM.position.z);MAX.visible=S.step==12&&!S.in;if(MAX.visible)MAX.rotation.y=Math.atan2(P.x-MAX.position.x,P.z-MAX.position.z);
 const kp=KPOS[S.step];if(kp&&kira.visible)kira.position.set(kp[0],0,kp[1]);
 const tg=tgt(),ar=$('arr');if(tg&&!busy&&!paused){const dx=tg[0]-P.x,dz=tg[1]-P.z,sy=Math.sin(yaw),cy=Math.cos(yaw);ar.hidden=false;ar.firstElementChild.style.transform='rotate('+Math.atan2(-dx*cy+dz*sy,dx*sy+dz*cy)+'rad)';$('ard').textContent=Math.round(Math.hypot(dx,dz))+' м'}else ar.hidden=true}
 async function craving(){sfx('heart',.3);
@@ -604,7 +609,7 @@ await ask('',S.love>=70?'Ты засыпаешь с её запахом на к�
 await ask('',S.self<35?'Ты почти не помнишь, когда в последний раз выбирал что-то для себя. Её радость — твоя радость, её боль — твоя вина.':S.self>=60?'Где-то глубоко ещё живёт человек, который помнит, чего он стоит. Он тихо ждёт своего часа.':'Внутри ровный шум. Ни ярости, ни надежды. Просто усталость.');
 if(S.f.acc||S.add>10)await ask('','Телефон лежит на тумбочке. В нём есть номер, который ты так и не удалил.');
 await ask('Итоги',`Привязанность к Кире: ${Math.round(S.love)} · Самоуважение: ${Math.round(S.self)} · Доверие Киры: ${Math.round(S.trust)} · Зависимость: ${Math.round(S.add)}`);
-await ask('',(S.f.left?'Конец главы 4. Ты ушёл сам, и это было твоё решение. Продолжение: «Глава 5».':'Конец главы 4. У вас теперь есть условия, а у тебя есть голос. Посмотрим, сдержит ли она слово. Продолжение: «Глава 5».'));S.step=15;toast('Глава 4 завершена')}
+await ask('',(S.f.left?'Конец главы 4. Ты ушёл сам, и это было твоё решение. Продолжение: «Глава 5».':'Конец главы 4. У вас теперь есть условия, а у тебя есть голос. Посмотрим, сдержит ли она слово. Продолжение: «Глава 5».'));S.step=15;toast('Глава 5 · «Расплата»');msg('Артём','Вадя, есть тема. Гаражи, сегодня. Без Киры.')}
 
 const IA=[
 {in:0,x:5,z:35,r:2.6,l:()=>'Поговорить с Кирой',ok:()=>S.step==11,fn:talkKira4a},
@@ -641,13 +646,121 @@ async function nina(){await ask('Баба Нина','Вадик! Сумки тя
 if(await ask('Вадим','Бабушка смотрит с надеждой.',['Конечно.','Нет времени.'])){chg({rep:-2});return}
 await fade('Три пролёта с сумками…',()=>{S.min+=25;chg({en:-10,sat:-4})});S.f.nina=1;S.money+=100;chg({rep:5,self:3});sfx('coin');
 await ask('Баба Нина','Золотой мальчик. Держи сотку. И послушай старуху: от Артёма держись подальше. Я видела, кого он возит.')}
-IA.push({in:0,x:-62,z:67.8,r:2.6,l:()=>'Купить у Артёма',ok:()=>S.step>=5&&S.step!=7&&S.step!=4&&!(S.step==9&&S.f.route=='bad'),fn:dealer},
+IA.push({in:0,x:-62,z:67.8,r:2.6,l:()=>'Купить у Артёма',ok:()=>S.step>=5&&S.step!=7&&S.step!=4&&S.step!=15&&S.step!=16&&!(S.step==9&&S.f.route=='bad'),fn:dealer},
 {in:0,x:-30,z:2.6,r:2.8,l:()=>'Расчистить снег у подъезда (+150 ₽)',ok:()=>S.step>=2&&S.f.shD!==dayN(),fn:shovel},
 {in:0,x:-52,z:26,r:2.8,l:()=>'Собрать бутылки (+120 ₽)',ok:()=>S.step>=2&&S.f.btD!==dayN(),fn:bottles},
 {in:0,x:-40,z:8,r:2.4,l:()=>'Помочь бабе Нине с сумками',ok:()=>S.step>=2&&!S.f.nina,fn:nina});
+const DEL=[[10,20],[-56,22],[-12,12],[45,28],[-20,-24]];
+async function courier(){const t=DEL[Math.floor(Math.random()*DEL.length)];S.f.job={t,t0:S.min,lim:Math.hypot(t[0]-P.x,t[1]-P.z)/3.5+6};await ask('Администратор','Заказ горячий, остывает быстро. Адрес на метке. Чем быстрее доставишь, тем больше чаевых.')}
+async function deliver(){const j=S.f.job,fast=S.min-j.t0<=j.lim,pay=160+(fast?110:0);S.f.job=null;S.money+=pay;chg({en:-8,rep:2});sfx('coin');await ask('Клиент',fast?'Ещё горячее! Держи на чай.':'Остыло… ну ладно, спасибо.');toast('Заказ доставлен: +'+pay+' ₽'+(fast?' (быстро!)':''))}
+async function unload(){if(S.en<25){await ask('','Ноги подкашиваются. Сегодня не потянешь.');return}const k=await miniWork('Разгружай фуру: жми, когда метка в зелёной зоне');await fade('Фура пустеет ящик за ящиком…',()=>{S.min+=90;chg({en:-25,sat:-10,str:3})});S.f.unl=dayN();S.money+=250+k*40;sfx('coin');toast('Ночная смена: +'+(250+k*40)+' ₽')}
+IA.push({in:0,x:32,z:8.2,r:1.8,l:()=>'Взять заказ курьера (+160 ₽)',ok:()=>S.step>=2&&!S.f.job,fn:courier},
+{in:0,get x(){return S.f.job?S.f.job.t[0]:1e4},get z(){return S.f.job?S.f.job.t[1]:1e4},r:2.6,l:()=>'Отдать заказ',ok:()=>!!S.f.job,fn:deliver},
+{in:0,x:25,z:21,r:2.6,l:()=>'Ночная разгрузка (+250 ₽)',ok:()=>S.step>=2&&(hh()>=19||hh()<5)&&S.f.unl!==dayN(),fn:unload});
+IA.unshift({in:0,x:-62,z:67.8,r:2.6,l:()=>'Поговорить с Артёмом',ok:()=>S.step==15,fn:talkArtem5},
+{in:0,x:-62,z:67.8,r:2.6,l:()=>'Отдать долг Артёму',ok:()=>S.step==16,fn:payDebt},
+{in:0,x:64,z:28,r:2.8,l:()=>'Войти в центр с Кирой',ok:()=>S.step==18,fn:talkCenter});
+/* ===== Глава 6 · «Тимур» ===== */
+const TIM=person({top:0x15151a,leg:0x1d1d22,skin:0xc99a7c,hair:0x0e0e0e,shoe:0x111111});TIM.position.set(-92,0,82);TIM.visible=false;
+async function talkTimur(){let c;
+await ask('','Тимур совсем не такой, как рисует воображение. Спокойный, в чистом чёрном пальто, пьёт чай из термоса. Только глаза не мигают.');
+await ask('Тимур',S.f.deep?'Долг закрыт, уважаю. Но ты видел лица, адреса, схему. Такие, как ты, либо с нами, либо молчат очень громко.':'Ты чистый. Редкость. А чистые бывают очень полезны.');
+await ask('Тимур','Мне нужен человек, которого никто не знает. Просто ходить. Пять тысяч в неделю. И ещё: у тебя милая Кира. Береги её.');
+c=await ask('Вадим','Угроза прозвучала так буднично, что от этого страшнее.',['«Тронешь Киру, пойду в полицию».','«Я подумаю». Потянуть время.','«Я в деле».']);
+if(c==0){chg({self:10,str:12,rep:3});S.f.report=1;await ask('Тимур','(улыбается) Смелый. Иди. Посмотрим, хватит ли смелости на второй раз.')}
+else if(c==1){chg({str:8});S.f.stall=1;await ask('Тимур','Три дня. Потом я перестану быть вежливым.')}
+else{S.f.deep=1;S.f.timur=1;S.money+=2000;chg({rep:-12,str:15,self:-8,add:3});await ask('Тимур','Правильный выбор. Это задаток.')}
+S.step=22;msg('Кира','Вадь, мне написал незнакомый номер: «береги себя, Вадим хороший». Что происходит? Выйди во двор.')}
+async function talkKira6(){let c;
+await ask('Кира','Он знает моё имя, знает, где я живу. Это из-за тебя? Только честно.');
+c=await ask('Вадим','Она смотрит прямо. Врать уже нет сил.',['Рассказать всё и попросить помощи.','«Просто ошибся номером».','«Не лезь, я сам».']);
+if(c==0){S.f.help=1;chg({trust:8,self:5,love:3,str:-8});await ask('Кира','Тогда идём в центр. Сергей знает юриста. И я с тобой. Не рядом, а с тобой.')}
+else if(c==1){chg({trust:-8,str:8});await ask('Кира','Хорошо. Но я больше не буду закрывать глаза.')}
+else{chg({trust:-12,love:-4,str:6});await ask('Кира','Тогда не удивляйся, если я просто уйду. Я не мебель, Вадим.')}
+S.step=23}
+async function ending6(){await ask('',S.f.timur?'Ты лежишь, а деньги Тимура лежат под подушкой. Они не греют.':S.f.report?'Слово «полиция» звучало храбрее вслух, чем звучит в темноте.':'Ты считаешь трещины на потолке. Три дня не так уж много.');
+if(S.f.help)msg('Кира','Юрист ждёт в центре. Идём вместе.',1);
+await ask('Итоги главы',S.f.timur?'Путь: тёмная дорога. Деньги есть, выхода почти нет.':S.f.help?'Путь: тяжёлая, но честная дорога. Ты не один.':'Путь: неопределённость. Решения ещё впереди.');
+await ask('','Конец главы 6. Скоро всё решится.');S.step=24;toast('Глава 7 · «Решение»')}
+const KL=['Вчера впервые за месяц выспалась.','Бабушка спрашивает, когда ты придёшь на пироги.','Расскажи что-нибудь не про проблемы. Про что угодно.','Я записалась на курсы. Боюсь, но записалась.'];
+async function kiraFree(){await ask('Кира',KL[Math.floor(Math.random()*KL.length)]);S.f.kD=dayN();chg({love:3,trust:2,str:-6,self:1});toast('Вечер с Кирой')}
+IA.unshift({in:0,x:-92,z:82,r:2.8,l:()=>'Поговорить с Тимуром',ok:()=>S.step==21,fn:talkTimur},
+{in:0,x:-20,z:4.4,r:2.6,l:()=>'Подойти к Кире',ok:()=>S.step==22,fn:talkKira6},
+{in:0,x:-20,z:4.4,r:2.6,l:()=>'Посидеть с Кирой',ok:()=>S.step==20&&hh()>=17&&hh()<23&&S.f.kD!==dayN(),fn:kiraFree});
+/* ===== люди: оживление, одежда, прохожие, небо ===== */
+winter(artem,0x4a4a3a,0x333333,0x1c1c1c);winter(MAX,0x7a2a2a,0xdddddd,0x2a2a2a);winter(TIM,0x15151a,0x555555,0x15151a);
+const NPC=[artem,MAX,TIM,kira];function idle(g,t){const u=g.userData;if(!u.A)return;const k=g.id%7;g.scale.y=1+Math.sin(t*1.7+k)*.007;u.A[0].rotation.x=Math.sin(t*1.1+k)*.05;u.A[1].rotation.x=-Math.sin(t*1.1+k)*.05}
+const PED=[];for(let i=0;i<6;i++){const g=person({top:0x333333,leg:0x222226,skin:[0xe0b090,0xc99a7c,0xd9a98a][i%3],hair:[0x1c1511,0x5e3f26,0x8a6a3a][i%3],shoe:0x222222,long:i%2});winter(g,[0x6a3a3a,0x3a5a3a,0x4a4a6a,0x7a6a3a,0x2a4a5a,0x5a3a5a][i],[0xdddddd,0xb8473a,0x3a7a5a][i%3],[0x2a2a2e,0x8a2a2a,0x2a2a2e][i%3]);g.position.set(-90+i*35,0,33.6+(i%2)*2.4);PED.push({g,d:i%2?1:-1,sp:1+Math.random()*.5})}
+const mo=new THREE.Sprite(new THREE.SpriteMaterial({map:glowT,color:0xdfe8ff,fog:false,depthWrite:false,transparent:true}));mo.scale.set(40,40,1);scene.add(mo);
+const sa=new Float32Array(900);for(let i=0;i<300;i++){const a=Math.random()*6.28,b=Math.random()*1.2+.2,r=200;sa[i*3]=Math.cos(a)*Math.cos(b)*r;sa[i*3+1]=Math.sin(b)*r*.8;sa[i*3+2]=Math.sin(a)*Math.cos(b)*r}
+const sgm=new THREE.BufferGeometry();sgm.setAttribute('position',new THREE.BufferAttribute(sa,3));const stars=new THREE.Points(sgm,new THREE.PointsMaterial({size:1.8,color:0xffffff,fog:false,sizeAttenuation:false,transparent:true}));stars.frustumCulled=false;scene.add(stars);
+let l2=performance.now();(function f(){requestAnimationFrame(f);const n=performance.now(),dt=Math.min(.05,(n-l2)/1000),t=n/1000;l2=n;
+const h=hh(),nt=(h>=17.5||h<7.5)&&!S.in;stars.visible=mo.visible=nt;stars.position.copy(P);mo.position.set(P.x+60,85,P.z-120);
+PED.forEach((o,i)=>{const g=o.g;g.visible=!S.in;if(!started||paused||S.in)return;g.position.x+=o.d*o.sp*dt;if(g.position.x>110)o.d=-1;if(g.position.x<-110)o.d=1;g.rotation.y=o.d>0?Math.PI/2:-Math.PI/2;anim(g,t*o.sp*2.6+i,.6)})})();
+/* ===== Глава 7 · «Решение» ===== */
+async function talk7a(){let c;
+await ask('Тимур','Первое дело. Сумка в гараже у Артёма. Отнесёшь на склад на окраине. Не открывать, не звонить, не оглядываться.');
+await ask('Тимур','И ещё: мне нужно знать, что ты не побежишь к Кире. Телефон оставь у меня.');
+c=await ask('Вадим','Он забирает единственный способ позвать на помощь.',['Отдать телефон.','Сказать «нет» и уйти.','Притвориться, что согласен.']);
+if(c==0){S.f.phoneTaken=1;chg({self:-10,str:12,trust:-6,rep:-8});S.money+=3000;await ask('','Телефон исчезает в кармане Тимура. Ты чувствуешь себя голым.')}
+else if(c==1){S.f.timur=0;S.f.report=1;chg({self:12,str:14,rep:4});await ask('Тимур','(без эмоций) Иди. Но дверь за тобой не закроется. Запомни.')}
+else{S.f.fake=1;chg({str:10,self:-2});await ask('Тимур','Умный. Через два дня проверим, насколько.')}
+await fade('Вечереет. Ты возвращаешься во двор…',()=>toTime(21));S.step=25}
+async function talk7b(){let c;
+await ask('Марина','Я юрист. Бесплатно, по линии центра. Расскажите всё, что знаете о Тимуре, а я объясню, как защитить вас и Киру.');
+c=await ask('Вадим','Кира сжимает твою руку.',['Рассказать всё и дать показания.','Рассказать только про себя.','Встать и уйти.']);
+if(c==0){S.f.testify=1;chg({self:10,trust:8,love:4,str:10,rep:-2});await ask('Марина','Это страшно, но вас защитят. Заявление уже принято.')}
+else if(c==1){chg({self:3,trust:2,str:6});await ask('Марина','Это шаг. Но вопрос Тимура он не закроет.')}
+else{chg({self:-4,trust:-10,love:-4,str:10});await ask('Кира','(тихо) Я надеялась, что ты хотя бы попробуешь.')}
+await fade('Вы выходите на улицу. Уже темно…',()=>toTime(21));S.step=25}
+async function finale7(){await ask('','У подъезда стоит чёрная машина с погашенными фарами. Окно медленно опускается.');
+if(S.f.phoneTaken){await ask('Водитель','Завтра в шесть. Тимур любит пунктуальных.');S.f.dark=1}
+else{const c=await ask('Вадим','Руки дрожат, но телефон в кармане.',['Пройти мимо, не оборачиваясь.','Незаметно сфотографировать номер.']);if(c==1){S.f.photo=1;chg({self:6,str:8,rep:2});sfx('warm')}else chg({str:6})}
+await fade('',()=>{S.in=1;P.set(1.2,0,-299.6);toTime(23)});
+const ar=!S.f.dark&&(S.f.testify||S.f.photo);
+await ask('',ar?'Утром звонок от Марины: машину нашли, Тимура задержали. Артём исчез. Двор снова похож на двор.':S.f.dark?'Ты лежишь в темноте без телефона. Завтра в шесть. Выхода всё меньше.':'Ночь без сна. Тимур на свободе, и ты это знаешь.');
+if(ar)chg({trust:6,self:8,str:-15,rep:5});
+await ask('Итоги главы 7',ar?'Финал: честный. Страшно, но ты не один.':S.f.dark?'Финал: тёмный. Ты внутри системы.':'Финал: открытый. Опасность не ушла.');
+await ask('','Конец главы 7. Дальше свободная игра: подработки, вечера с Кирой, центр. Продолжение следует.');S.step=20;toast('Свободная игра')}
+IA.unshift({in:0,x:-92,z:82,r:2.8,l:()=>'Поговорить с Тимуром',ok:()=>S.step==24&&!!S.f.timur,fn:talk7a},
+{in:0,x:64,z:28,r:2.8,l:()=>'Войти в центр с Кирой',ok:()=>S.step==24&&!S.f.timur,fn:talk7b},
+{in:0,x:-30,z:-2.3,r:2.4,l:()=>'Войти домой',ok:()=>S.step==25,fn:finale7});
+/* ===== Глава 5 · «Расплата» ===== */
+async function talkArtem5(){const dirty=S.f.courier||S.f.deep||S.f.uses||S.f.acc||S.f.relapse;
+if(!dirty){await ask('Артём','Ты чистый, Вадя. Скучный, но чистый. Тимур спрашивал про тебя: кто видел гаражи, тот молчит. Понял?');chg({self:3,str:4});await ask('','Ты киваешь. Дальше эта дверь для тебя закрыта, и ты этому рад.');S.step=17;return}
+S.f.debt=S.f.courier||S.f.deep?4000:2500;
+await ask('Артём','Вадя, без обид. Тимур считает. '+(S.f.courier||S.f.deep?'Свёрток помнишь? ':'Товар в долг — это тоже долг. ')+S.f.debt+' ₽. Сегодня.');
+const c=await ask('Вадим','Руки ледяные, хотя ты в пуховике.',['«Деньги будут. Дай время».','«Я тебе ничего не должен».','«Давай ещё один заход, закрою долг».']);
+if(c==0){chg({str:4});await ask('Артём','Принеси сегодня. Иначе Тимур придёт сам.');S.step=16}
+else if(c==1){chg({self:6,str:10,rep:2});await ask('Артём','(тихо) Это ты Тимуру скажешь. Лучше принеси деньги.');S.step=16}
+else{S.f.deep=1;S.f.debt=0;chg({rep:-10,str:12,self:-6,add:3});await ask('','Ты относишь пакет через два двора. Долг закрыт, а тебе хуже, чем было.');S.step=17;msg('Кира','Ты где пропал? Я весь день пишу.')}}
+async function payDebt(){const d=S.f.debt,c=await ask('Артём','Долг: '+d+' ₽. У тебя '+Math.round(S.money)+' ₽.',['Отдать всё, что есть.','Уйти. Заработать ещё.']);if(c)return;
+const pay=Math.min(S.money,d);if(pay<=0){await ask('Артём','Карманы пустые? Иди работай.');return}
+S.money-=pay;S.f.debt-=pay;sfx('coin');
+if(S.f.debt<=0){chg({self:8,str:-12,rep:2});await ask('Артём','Всё. Мы в расчёте. Но дверь для тебя открыта.');await ask('','Ты отвечаешь: «Не понадобится». Впервые это звучит как правда.');S.step=17}
+else{chg({str:6});await ask('Артём','Осталось '+S.f.debt+'. Тимур считает каждый день.')}}
+async function ending5a(){await ask('','Долг закрыт, телефон молчит. Тишина непривычная, как после долгой болезни.');
+await ask('Кира','Сегодня центр. Я у входа, справа за магазином. Приходи, когда будешь готов. Я никуда не тороплюсь.');
+S.step=18;toast('Сегодня: центр помощи')}
+async function talkCenter(){let c;
+await ask('Кира',S.f.cond?'Ты пришёл. Я боялась, что нет.':'Ты пришёл. Я сама не верила.');
+await ask('','Серый дом, внутри пахнет чаем и линолеумом. Психолог Лена в свитере не задаёт лишних вопросов, просто показывает на круг стульев.');
+c=await ask('Вадим','Ладони мокрые. Дверь ещё открыта.',['Сесть в круг.','«Я подожду снаружи».','Развернуться и уйти.']);
+if(c==2){chg({self:-4,trust:-4,str:6});await ask('Кира','(тихо) Хорошо. Я не буду тебя тащить.')}
+else if(c==1){chg({str:-2});await ask('','Сорок минут на крыльце, снег за воротником. Один раз ты заходишь в коридор, слушаешь голоса и выходишь обратно.')}
+else{S.f.center2=1;await ask('Лена','Красиво рассказывать не нужно. Расскажи, как есть.'+(S.f.od?' И про вечер, когда тебя нашли у подъезда.':''));
+c=await ask('Вадим','Двенадцать человек. Никто не осуждает.',['Правду: сколько, на что, когда.','Часть правды.','Промолчать.']);
+if(c==0)chg({add:-14,str:-12,self:9,trust:4});else if(c==1)chg({add:-5,str:-4,self:3});else chg({add:-1,str:2});
+await ask('Сергей','Шесть лет без. Каждое утро как первое. Но я туда не вернусь. Хочешь, после поговорим.');
+await ask('','Впервые за долгое время ты слушаешь чужую историю и не хочешь сбежать.')}
+await fade('День уходит на разговоры, чай и тишину…',()=>{toTime(20)});
+S.step=19;msg('Кира',S.f.center2?'Спасибо, что зашёл. Это было твоё решение, не моё.':'Я никуда не денусь. Приходи, когда будешь готов.')}
+async function ending5b(){await ask('',S.f.center2?'Ты засыпаешь без злости. Пустота внутри чистая, а не выжженная.':'Ты лежишь и слушаешь, как гудит батарея. Ничего не решено, но ты вышел из дома и дошёл до двери. Пока этого достаточно.');
+await ask('Итоги главы',`Зависимость: ${Math.round(S.add)} · Самоуважение: ${Math.round(S.self)} · Доверие: ${Math.round(S.trust)} · Привязанность: ${Math.round(S.love)} · Репутация: ${Math.round(S.rep)}`);
+await ask('','Конец главы 5. Но кто-то уже набирает твой номер.');S.step=21;toast('Глава 6 · «Тимур»');msg('Неизвестный номер','Это Тимур. Нужно поговорить. Промзона за гаражами. Сегодня.')}
 const near=()=>{let b=null,bd=1e9;for(const a of IA){if(!!a.in!=!!S.in||(a.ok&&!a.ok()))continue;const d=Math.hypot(P.x-a.x,P.z-a.z);if(d<a.r&&d<bd){b=a;bd=d}}return b};
 const act=()=>{if(busy||paused)return;const a=near();if(a)run(a.fn)};
-function tgt(){const s=S.step,d=[2.4,-298.2];if(s<1)return null;if(s==1)return S.in?d:null;if(s==5||s==8||s==10||s==14)return S.in?[-2.2,-301.2]:[-30,-2.3];if(S.in)return d;return s==12?[19,7]:s==13?[-20,4.4]:s==2?[25,8.2]:s==3||s==6||s==11||(s==9&&S.f.route!='bad')?[5,35]:s==4||s==7||(s==9&&S.f.route=='bad')?[-62,67.8]:null}
+function tgt(){const s=S.step,d=[2.4,-298.2];if(s<1)return null;if(S.f.job&&!S.in)return S.f.job.t;if(s>=15&&s<20){if(s==17||s==19)return S.in?[-2.2,-301.2]:[-30,-2.3];if(S.in)return d;return s==18?[64,28]:[-62,67.8]}if(s>=21){if(s==24)return S.in?d:(S.f.timur?[-92,82]:[64,28]);if(s==25)return S.in?d:[-30,-2.3];if(s==23)return S.in?[-2.2,-301.2]:[-30,-2.3];if(S.in)return d;return s==21?[-92,82]:[-20,4.4]}if(s==20)return null;if(s==1)return S.in?d:null;if(s==5||s==8||s==10||s==14)return S.in?[-2.2,-301.2]:[-30,-2.3];if(S.in)return d;return s==12?[19,7]:s==13?[-20,4.4]:s==2?[25,8.2]:s==3||s==6||s==11||(s==9&&S.f.route!='bad')?[5,35]:s==4||s==7||(s==9&&S.f.route=='bad')?[-62,67.8]:null}
 /* ===== телефон / меню ===== */
 function openPhone(){if(busy||paused)return;$('bP').classList.remove('dot');paused=true;$('ph').innerHTML=S.msgs.map(m=>`<div class="msg"><b>${m.f}</b><small>${m.h}</small><br>${m.t}</div>`).join('');
 const st=(n,v)=>`<div class="st">${n}<i><b style="width:${v}%"></b></i></div>`;$('pst').innerHTML=st('Доверие Киры',S.trust)+st('Привязанность',S.love)+st('Самоуважение',S.self)+st('Репутация',S.rep)+st('Зависимость',S.add)+`<div class="st">Деньги<span>${S.money} ₽</span></div>`;
@@ -697,7 +810,7 @@ if(pp[k]-P.x>30)pp[k]-=60;else if(pp[k]-P.x<-30)pp[k]+=60;if(pp[k+2]-P.z>30)pp[k
 sfxEnv(t,wt,f);
 cvs.style.filter='none';
 cam.fov=60+Math.sin(t*1.3)*7*fx;cam.updateProjectionMatrix()}
-function update(dt,t){heroTick(dt);NPCM.forEach(x=>x.update(dt));extraTick(dt,t);
+function update(dt,t){heroTick(dt);NPCM.forEach(x=>x.update(dt));NPC.forEach(g=>idle(g,t));extraTick(dt,t);
 if(!busy){const kx=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0),ky=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0);
 let ix=kx+jx,iy=ky+jy;const l=Math.hypot(ix,iy);if(l>1){ix/=l;iy/=l}
 const run=(keys.ShiftLeft||keys.ShiftRight||runT)&&l>.1&&S.en>5,sx=Math.sin(yaw),cz=Math.cos(yaw);let dx=sx*iy-cz*ix,dz=cz*iy+sx*ix;
@@ -718,7 +831,7 @@ for(let k=0;k<6;k++){cx=P.x-Math.sin(yaw)*Math.cos(ph2)*dist*sc;cz=P.z-Math.cos(
 if(S.in){cx=clamp(cx,-3.4,3.4);cz=clamp(cz,-302.7,-297.3);cy=Math.min(cy,2.5)}
 cam.position.set(cx,Math.max(.4,cy),cz);cam.lookAt(P.x,1.4,P.z);cam.rotateZ(Math.sin(t*.9)*.06*FXI+Math.sin(t*35)*.004*CDI);
 /* NPC и маркеры */
-kira.visible=S.step==3||S.step==6||S.step==11||S.step==12||S.step==13||(S.step==9&&S.f.route!='bad');kira.rotation.z=Math.sin(t*1.1)*.012;artem.visible=!S.in&&true;if(kira.visible)kira.rotation.y=Math.atan2(P.x-kira.position.x,P.z-kira.position.z);artem.rotation.y=Math.atan2(P.x-artem.position.x,P.z-artem.position.z)*(Math.hypot(P.x-artem.position.x,P.z-artem.position.z)<25?1:0)+(Math.hypot(P.x-artem.position.x,P.z-artem.position.z)<25?0:Math.PI);
+kira.visible=S.step==3||S.step==6||S.step==11||S.step==12||S.step==13||S.step==18||S.step==22||(S.step==24&&!S.f.timur)||(S.step==20&&hh()>=17&&hh()<23)||(S.step==9&&S.f.route!='bad');kira.rotation.z=Math.sin(t*1.1)*.012;artem.visible=!S.in&&true;if(kira.visible)kira.rotation.y=Math.atan2(P.x-kira.position.x,P.z-kira.position.z);artem.rotation.y=Math.atan2(P.x-artem.position.x,P.z-artem.position.z)*(Math.hypot(P.x-artem.position.x,P.z-artem.position.z)<25?1:0)+(Math.hypot(P.x-artem.position.x,P.z-artem.position.z)<25?0:Math.PI);
 const tg=tgt();beacon.visible=!!tg&&!busy;if(tg)beacon.position.set(tg[0],20,tg[1]);
 const a=!busy&&near();$('pr').hidden=!a;if(a)$('pr').textContent=(document.body.classList.contains('touch')?'':'E · ')+a.l();
 hudT+=dt;if(hudT>.25){hudT=0;$('b1').style.width=S.sat+'%';$('b2').style.width=S.en+'%';$('b3').style.width=S.str+'%';$('tm').innerHTML=`<span>${clk()}</span>День ${Math.floor(S.min/1440)+1} · ${Math.round(S.money)} ₽`;$('obj').textContent=OBJ[S.step];if(S.step==0&&!S.msgs.length)0;if(!(Math.floor(t)%10))save()}
