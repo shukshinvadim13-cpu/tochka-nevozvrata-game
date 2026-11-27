@@ -59,20 +59,20 @@ button:active{background:#2a313b}
 #mgt{position:relative;height:26px;background:#ffffff1c;border-radius:13px;width:100%}
 #mgz{position:absolute;top:0;height:100%;background:#6fa58a99;border-radius:13px}
 #mgb{position:absolute;top:-4px;width:6px;height:34px;background:var(--acc);border-radius:3px;margin-left:-3px}
-</style></head><body>
+#v2e{position:fixed;inset:0;z-index:9;background:#05070bf7;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;text-align:center;overflow:auto;touch-action:pan-y}#v2e h2{font:700 clamp(34px,9vw,60px) Georgia,serif;margin:0;animation:fi 1.4s both}#v2es{color:var(--acc);animation:fi 1.4s .4s both}#v2el{max-width:520px}#v2el p{margin:8px 0;color:var(--dim);opacity:0;animation:fi 1s forwards}#v2el p:first-child{color:var(--ink);font:italic 17px/1.5 Georgia,serif}@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}</style></head><body>
 <canvas id="c"></canvas>
 <div id="vig"></div>
 <div id="rot">📱↺<br>Поверните телефон горизонтально</div>
-<div id="hud"><div class="bars"><label>Сытость<i><b id="b1"></b></i></label><label>Силы<i><b id="b2"></b></i></label><label>Стресс<i><b id="b3"></b></i></label></div><div id="tm"></div></div>
-<div id="obj"></div>
+<div id="hud"><div class="bars"><label>Сытость<i><b id="b1"></b></i></label><label>Силы<i><b id="b2"></b></i></label><label>Стресс<i><b id="b3"></b></i></label><label>Здоровье<i><b id="b4" style="background:#6fa58a"></b></i></label></div><div id="tm"></div></div>
+<div id="obj"></div><div id="v2e" hidden><h2 id="v2et"></h2><div id="v2es"></div><div id="v2el"></div><button id="v2eb">Продолжить</button></div><div id="v2s" style="position:fixed;left:max(10px,env(safe-area-inset-left));top:max(86px,calc(env(safe-area-inset-top) + 78px));font-size:11px;color:#c4554d;text-shadow:0 1px 3px #000;pointer-events:none"></div><div id="v2p" hidden style="position:fixed;inset:0;z-index:7;background:#05070bdd;display:flex;align-items:center;justify-content:center"><div class="card" id="v2c"></div></div>
 <div id="arr" hidden><b>▲</b><span id="ard"></span></div>
 <div id="mg" hidden><div class="card"><b>Смена в магазине</b><div id="mgi"></div><div id="mgt"><div id="mgz"></div><div id="mgb"></div></div><button id="mgbtn" style="padding:16px">Поставить ящик</button></div></div>
 <div id="pr" hidden></div>
 <div id="toast"></div>
 <div id="dlg" hidden><div id="dw"></div><div id="dt"></div><div id="dc"></div></div>
-<div id="phone" hidden><div class="card"><b>Телефон</b><div id="ph"></div><div id="pst"></div><button id="help" hidden>Написать Кире правду и попросить помощи</button><button id="pclose">Закрыть</button></div></div>
+<div id="phone" hidden><div class="card"><b>Телефон</b><div id="ph"></div><div id="pst"></div><button id="help" hidden>Написать Кире правду и попросить помощи</button><button id="v2b">Рюкзак и заказы</button><button id="pclose">Закрыть</button></div></div>
 <div id="menu" hidden><div class="card"><b>Пауза</b><button id="mres">Продолжить</button><button id="msave">Сохранить</button><button id="munst">Я застрял / вернуть на место</button><button id="mq">Графика</button><button id="mw">Погода: авто</button><button id="mmus">Музыка</button><button id="mnew">Начать заново</button></div></div>
-<div id="start"><div class="card" style="background:none;border:0;text-align:center;justify-items:center;gap:14px"><h1>Точка невозврата</h1><div style="color:var(--acc)">Глава 1 · Обычный день</div><p>Сургут, ноябрь. Игра о одиночестве, любви и последствиях решений. Затрагивает тему зависимости и не романтизирует её. 18+</p><button id="go" style="background:var(--acc);color:#111;font-weight:600;padding:12px 28px">Играть</button><button id="newg" hidden>Новая игра</button><p class="hint">WASD — движение · мышь — камера · Shift — бег · E — действие · P — телефон · Esc — пауза</p></div></div>
+<div id="start"><div class="card" style="background:none;border:0;text-align:center;justify-items:center;gap:14px"><h1>Точка невозврата</h1><div style="font-size:12px;color:var(--acc)">версия 2.0</div><div style="color:var(--acc)">Глава 1 · Обычный день</div><p>Сургут, ноябрь. Игра о одиночестве, любви и последствиях решений. Затрагивает тему зависимости и не романтизирует её. 18+</p><button id="go" style="background:var(--acc);color:#111;font-weight:600;padding:12px 28px">Играть</button><button id="newg" hidden>Новая игра</button><p class="hint">WASD — движение · мышь — камера · Shift — бег · E — действие · P — телефон · Esc — пауза</p></div></div>
 <div id="fade"></div>
 <div id="ctl"><div id="zone"><i id="base"><i id="knob"></i></i></div><button class="b" id="bE">Действие</button><button class="b" id="bR">Бег</button><button class="b" id="bP">📱</button></div>
 <button id="bM">⏸</button>
@@ -85,15 +85,16 @@ const $=i=>document.getElementById(i),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),l
 if('ontouchstart'in window||matchMedia('(pointer:coarse)').matches)document.body.classList.add('touch');
 /* ===== состояние и сохранение ===== */
 const K='tochka_nevozvrata_v1';
-const def=()=>({sat:78,en:70,str:24,money:420,trust:50,rep:50,add:0,min:540,step:0,fx:0,x:-30,z:1.6,in:0,yaw:0,msgs:[],f:{},love:50,self:60,cd:0});
-let S;try{S=Object.assign(def(),JSON.parse(localStorage.getItem(K)))}catch(e){S=def()}
+const def=()=>({sat:78,en:70,str:24,money:420,trust:50,rep:50,add:0,min:540,step:0,fx:0,x:-30,z:1.6,in:0,yaw:0,msgs:[],f:{},love:50,self:60,cd:0,hp:100,tol:0,aw:0,lu:-9999,inv:{food:1,kit:0,tea:0},evT:0,v:2});
+let S;try{S=Object.assign(def(),JSON.parse(localStorage.getItem(K)))}catch(e){try{S=Object.assign(def(),JSON.parse(localStorage.getItem(K+'_bak')))}catch(e2){S=def()}}
 const hadSave=!!localStorage.getItem(K)&&S.step>0;
-const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
+const save=()=>{try{const p=localStorage.getItem(K);if(p&&Date.now()-(window.__bk||0)>120000){localStorage.setItem(K+'_bak',p);window.__bk=Date.now()}localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
 /* ===== three ===== */
-const QL={high:{n:'Высокая',pr:2,sh:2048,snow:2500,far:500,aa:1},medium:{n:'Средняя',pr:1.5,sh:1024,snow:1400,far:350,aa:1},low:{n:'Низкая',pr:1,sh:0,snow:500,far:220,aa:0}};
-let QK=localStorage.getItem('tn_q')||(/iPhone|iPad/.test(navigator.userAgent)?'medium':'high');if(!QL[QK])QK='medium';let QS=QL[QK];
+const MOB=/Mobi|iPhone|iPad|Android/i.test(navigator.userAgent)||matchMedia('(pointer:coarse)').matches;
+const QL={high:{n:'Высокая',pr:MOB?1.75:2,sh:2048,snow:2500,far:500,aa:1},medium:{n:'Средняя',pr:1.25,sh:1024,snow:1000,far:350,aa:1},low:{n:'Низкая',pr:1,sh:0,snow:500,far:220,aa:0}};
+let QK=localStorage.getItem('tn_q')||(MOB?((navigator.deviceMemory||4)<=3||(navigator.hardwareConcurrency||4)<=4?'low':'medium'):'high');if(!QL[QK])QK='medium';let QS=QL[QK];
 const cvs=$('c'),R=new THREE.WebGLRenderer({canvas:cvs,antialias:!!QS.aa,powerPreference:'high-performance'});
-R.setPixelRatio(Math.min(devicePixelRatio,QS.pr));R.outputEncoding=THREE.sRGBEncoding;R.toneMapping=THREE.ACESFilmicToneMapping;R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
+R.setPixelRatio(Math.min(devicePixelRatio,QS.pr));R.outputEncoding=THREE.sRGBEncoding;R.toneMapping=THREE.ACESFilmicToneMapping;R.shadowMap.enabled=true;R.shadowMap.type=(MOB?THREE.PCFShadowMap:THREE.PCFSoftShadowMap);
 const scene=new THREE.Scene(),fog=new THREE.FogExp2(0x888888,.02);scene.fog=fog;scene.background=new THREE.Color(0x888888);
 const cam=new THREE.PerspectiveCamera(60,1,.1,500);
 const hemi=new THREE.HemisphereLight(0xaab8d0,0x30343a,.6),sun=new THREE.DirectionalLight(0xffffff,1);
@@ -460,7 +461,7 @@ async function buy(){if(S.money<150){await ask('','Денег не хватае�
 S.money-=150;sfx('coin');chg({sat:40,str:-3});await ask('','Хлеб, сосиски, пачка чая. Ничего особенного, но хотя бы не пусто в желудке.');
 if(S.step==2){S.step=3;msg('Кира','Я на остановке у твоего двора. Выйдешь?')}}
 async function work(){if(S.en<20){await ask('','Нет сил. Ноги едва держат.');return}
-const sc=await miniWork(),pay=150+sc*50;await fade('Смена на кассе и в зале пролетела…',()=>{S.min+=120;S.money+=pay;chg({en:-20,sat:-10,str:4,rep:2})});toast('Смена закончена: +'+pay+' ₽')}
+const sc=await miniWork(),pay=Math.round((150+sc*50)*workMul());await fade('Смена на кассе и в зале пролетела…',()=>{S.min+=120;S.money+=pay;chg({en:-20,sat:-10,str:4,rep:2})});toast('Смена закончена: +'+pay+' ₽')}
 async function fridge(){await ask('','Холодильник почти пустой. На дверце записка: «Мы на смене. Не жди». Ты давно перестал ждать.');if(!S.f.note){S.f.note=1;S.money+=200;toast('Под запиской лежит 200 ₽')}}
 async function sleepAct(){const h=hh();if(S.en>80&&h>=7&&h<21&&![5,8,10,14,17,19,23].includes(S.step)){await ask('','Спать не хочется.');return}
 const bad=S.add>20;sfx('sleep');await fade(AUTO?'День прошёл. Ты возвращаешься домой и засыпаешь…':'Ты проваливаешься в сон…',()=>{const m=S.min%1440;S.min=S.min-m+(m<420?420:1860);if(AUTO){S.in=1;P.set(1.2,0,-299.6);yaw=0}chg({en:bad?40:75,str:bad?8:-12,sat:-20})});
@@ -550,7 +551,7 @@ let HB=0,CRV=0;
 function extraTick(dt,t){
 if(!busy&&!paused){HB-=dt;if(HB<0){const f=FXI>.3,h=S.str>82;HB=f?.85:h?1:2;if(f||h)sfx('heart',f?.34:.16)}
 if(S.cd>0)S.cd-=dt;
-if(S.add>=10&&S.fx<=0&&S.step>=5){CRV+=dt*(S.add>40?1.6:1);if(CRV>110){CRV=0;run(craving)}}}
+if(S.add>=10&&S.fx<=0&&S.step>=5){CRV+=dt*(S.add>40?1.6:1);if(CRV>(110-Math.min(50,S.str*.4+(S.sat<20?15:0)))){CRV=0;run(craving)}}}
 TIM.visible=(S.step==21||(S.step==24&&S.f.timur))&&!S.in;if(TIM.visible)TIM.rotation.y=Math.atan2(P.x-TIM.position.x,P.z-TIM.position.z);MAX.visible=S.step==12&&!S.in;if(MAX.visible)MAX.rotation.y=Math.atan2(P.x-MAX.position.x,P.z-MAX.position.z);
 const kp=KPOS[S.step];if(kp&&kira.visible)kira.position.set(S.in==2?1.56:kp[0],0,S.in==2?-398.84:kp[1]);
 const tg=tgt(),ar=$('arr');if(tg&&!busy&&!paused){const dx=tg[0]-P.x,dz=tg[1]-P.z,sy=Math.sin(yaw),cy=Math.cos(yaw);ar.hidden=false;ar.firstElementChild.style.transform='rotate('+Math.atan2(-dx*cy+dz*sy,dx*sy+dz*cy)+'rad)';$('ard').textContent=Math.round(Math.hypot(dx,dz))+' м'}else ar.hidden=true}
@@ -634,11 +635,11 @@ const SUB={st:{n:'Белый порошок, стимулятор · 1200 ₽',p
 async function dealer(){
 await ask('Артём',S.f.uses?'О, свой человек. Что сегодня?':'Смотри, что есть. Без истерик.');
 const ks=['st','ch','sm'],c=await ask('Вадим','У тебя '+Math.round(S.money)+' ₽.',ks.map(k=>SUB[k].n).concat(['Уйти.']));if(c>2)return;
-const b=SUB[ks[c]];if(S.money<b.p){await ask('Артём','Без денег не работаю.');return}
-S.money-=b.p;S.f.uses=(S.f.uses||0)+1;sfx('coin');
+const b=SUB[ks[c]];if(S.money<b.p){if((S.f.debt||0)>4000){await ask('Артём','Ты и так должен. Сначала долг.');return}const cc=await ask('Артём','Денег нет? В долг дам. Вернёшь ×1.5.',['Взять в долг.','Уйти.']);if(cc)return;S.f.debt=(S.f.debt||0)+Math.round(b.p*1.5);S.money+=b.p;S.f.dd=0;msg('Артём','Записал: '+S.f.debt+' ₽. Срок неделя.')}
+S.money-=Math.round(b.p*(1+(S.tol||0)/100));S.f.uses=(S.f.uses||0)+1;sfx('coin');
 if(S.fx>0||S.cd>0){await fade('Ты принимаешь, пока прошлое не отпустило…',()=>{S.fx=0;S.cd=0;S.in=1;P.set(1.2,0,-299.6);S.min+=480;S.add=clamp(S.add+10,0,100);chg({trust:-15,self:-15,en:-40,str:20,rep:-5})});
 await ask('','Ты приходишь в себя дома. Во рту горько, руки не слушаются. Ты чудом не остался на морозе.');msg('Кира','Мне звонил твой сосед: тебя нашли у подъезда. Ты вообще понимаешь, что мог не проснуться?');return}
-S.f.acc=1;S.add=clamp(S.add+b.add+S.f.uses,0,100);startFx(b.fx*Math.max(.5,1-.1*(S.f.uses-1)));chg({en:b.en,self:b.self,str:6});
+S.f.acc=1;S.tol=clamp((S.tol||0)+7,0,100);S.hp=clamp((S.hp==null?100:S.hp)-6-S.tol*.06,0,100);S.add=clamp(S.add+b.add+S.f.uses,0,100);startFx(b.fx*Math.max(.5,1-.1*(S.f.uses-1))*(1-S.tol/200));chg({en:b.en,self:b.self,str:6});
 await ask('','Эффект приходит волной. С каждым разом всё слабее, а платить приходится всё больше.')}
 async function shovel(){if(S.en<15){await ask('','Нет сил.');return}const k=await miniWork('Чисти снег: жми, когда метка в зелёной зоне');S.f.shD=dayN();S.min+=60;S.money+=150+k*30;chg({en:-15,sat:-6,rep:1,self:2});sfx('coin');toast('Двор чист: +'+(150+k*30)+' ₽')}
 async function bottles(){await fade('Ты обходишь лавочки и контейнеры…',()=>{S.min+=40;chg({en:-8,sat:-4})});S.f.btD=dayN();S.money+=120;sfx('coin');toast('Сдал бутылки: +120 ₽')}
@@ -652,7 +653,7 @@ IA.push({in:0,x:-62,z:67.8,r:2.6,l:()=>'Купить у Артёма',ok:()=>S.s
 {in:0,x:-40,z:8,r:2.4,l:()=>'Помочь бабе Нине с сумками',ok:()=>S.step>=2&&!S.f.nina,fn:nina});
 const DEL=[[10,20],[-56,22],[-12,12],[45,28],[-20,-24]];
 async function courier(){const t=DEL[Math.floor(Math.random()*DEL.length)];S.f.job={t,t0:S.min,lim:Math.hypot(t[0]-P.x,t[1]-P.z)/3.5+6};await ask('Администратор','Заказ горячий, остывает быстро. Адрес на метке. Чем быстрее доставишь, тем больше чаевых.')}
-async function deliver(){const j=S.f.job,fast=S.min-j.t0<=j.lim,pay=160+(fast?110:0);S.f.job=null;S.money+=pay;chg({en:-8,rep:2});sfx('coin');await ask('Клиент',fast?'Ещё горячее! Держи на чай.':'Остыло… ну ладно, спасибо.');toast('Заказ доставлен: +'+pay+' ₽'+(fast?' (быстро!)':''))}
+async function deliver(){const j=S.f.job,fast=S.min-j.t0<=j.lim,pay=Math.round((160+(fast?110:0))*workMul());S.f.job=null;S.money+=pay;chg({en:-8,rep:2});sfx('coin');await ask('Клиент',fast?'Ещё горячее! Держи на чай.':'Остыло… ну ладно, спасибо.');toast('Заказ доставлен: +'+pay+' ₽'+(fast?' (быстро!)':''))}
 async function unload(){if(S.en<25){await ask('','Ноги подкашиваются. Сегодня не потянешь.');return}const k=await miniWork('Разгружай фуру: жми, когда метка в зелёной зоне');await fade('Фура пустеет ящик за ящиком…',()=>{S.min+=90;chg({en:-25,sat:-10,str:3})});S.f.unl=dayN();S.money+=250+k*40;sfx('coin');toast('Ночная смена: +'+(250+k*40)+' ₽')}
 IA.push({in:0,x:32,z:8.2,r:1.8,l:()=>'Взять заказ курьера (+160 ₽)',ok:()=>S.step>=2&&!S.f.job,fn:courier},
 {in:0,get x(){return S.f.job?S.f.job.t[0]:1e4},get z(){return S.f.job?S.f.job.t[1]:1e4},r:2.6,l:()=>'Отдать заказ',ok:()=>!!S.f.job,fn:deliver},
@@ -713,8 +714,7 @@ await ask('','Кира написала «береги себя» и больш�
 await ask('','И каждый день решаешь заново. Выход никогда не закрывается совсем. Это и есть самое трудное.')}
 else{await ask('','Всё не исправилось, но и не рухнуло. Ты ходишь в центр по четвергам, работаешь, иногда молчишь рядом с Кирой на лавочке.');
 await ask('Кира','Не знаю, что у нас будет. Но я хочу узнать. Если ты тоже.')}
-await ask('Итог',`Привязанность ${Math.round(S.love)} · Самоуважение ${Math.round(S.self)} · Доверие ${Math.round(S.trust)} · Зависимость ${Math.round(S.add)}`);
-await ask('','«Точка невозврата». Эпилог. Спасибо, что дошёл до конца. Игра продолжается в свободном режиме.')}
+await v2Ending();await ask('','Игра продолжается в свободном режиме.')}
 IA.unshift({in:1,x:0,z:-297.7,r:2,l:()=>'Календарь: дожить до весны (эпилог)',ok:()=>S.step==20&&!S.f.ep,fn:spring});
 /* ===== люди: оживление, одежда, прохожие, небо ===== */
 winter(artem,0x4a4a3a,0x333333,0x1c1c1c);winter(MAX,0x7a2a2a,0xdddddd,0x2a2a2a);winter(TIM,0x15151a,0x555555,0x15151a);
@@ -858,7 +858,7 @@ $('help').onclick=()=>{chg({add:-10,str:-6,trust:S.f.lied?-2:5});msg('Кира',
 function menu(on){if(!started||busy&&on)return;paused=on;$('menu').hidden=!on;if(on&&document.pointerLockElement)document.exitPointerLock();save()}
 $('mres').onclick=()=>menu(false);$('msave').onclick=()=>{save();toast('Сохранено')};$('bM').onclick=()=>menu(true);
 $('munst').onclick=()=>{if(S.in){P.set(1.2,0,-299.6)}else{P.set(-30,0,-1.2)}yaw=0;menu(false);toast('Вы перемещены')};
-$('mq').textContent='Графика: '+QS.n;$('mq').onclick=()=>{const k=Object.keys(QL);QK=k[(k.indexOf(QK)+1)%3];QS=QL[QK];localStorage.setItem('tn_q',QK);$('mq').textContent='Графика: '+QS.n;applyQ();toast('Качество: '+QS.n)};
+$('mq').textContent='Графика: '+QS.n;$('mq').onclick=()=>{const k=Object.keys(QL);QK=k[(k.indexOf(QK)+1)%3];QS=QL[QK];localStorage.setItem('tn_q',QK);localStorage.setItem('tn_qm',1);$('mq').textContent='Графика: '+QS.n;applyQ();toast('Качество: '+QS.n)};
 $('mw').onclick=()=>{const o=[null,'snow','rain','fog'],n=['авто','снег','дождь','туман'];let i=(o.indexOf(W.lock)+1)%4;W.lock=o[i];$('mw').textContent='Погода: '+n[i]};
 $('mnew').onclick=()=>{if(confirm('Стереть прогресс?')){localStorage.removeItem(K);location.reload()}};
 $('bP').onclick=openPhone;
@@ -903,7 +903,7 @@ if(!busy){const kx=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1
 let ix=kx+jx,iy=ky+jy;const l=Math.hypot(ix,iy);if(l>1){ix/=l;iy/=l}
 const run=(keys.ShiftLeft||keys.ShiftRight||runT)&&l>.1&&S.en>5,sx=Math.sin(yaw),cz=Math.cos(yaw);let dx=sx*iy-cz*ix,dz=cz*iy+sx*ix;
 if(S.fx>0){dx+=Math.sin(t*1.7)*.25*Math.hypot(dx,dz);dz+=Math.cos(t*1.3)*.25*Math.hypot(dx,dz)}
-const sp=(run?5.2:2.5)*(S.en<12?.75:1),m=Math.hypot(dx,dz);
+const sp=(run?5.2:2.5)*(S.en<12||S.hp<25||S.sat<8?.72:1),m=Math.hypot(dx,dz);
 if(m>.05){P.x+=dx*sp*dt;P.z+=dz*sp*dt;let d=Math.atan2(dx,dz)-pl.rotation.y;d=Math.atan2(Math.sin(d),Math.cos(d));pl.rotation.y+=d*Math.min(1,dt*12);ph+=sp*dt*2.2;{const sn=Math.floor(ph/Math.PI);if(sn!=lastSn){lastSn=sn;sfx('step',run,S.in)}}anim(pl,ph,.7,sp);if(run)S.en=clamp(S.en-dt*.5,0,100)}else anim(pl,0,0);
 const B=S.in==2?CI2:S.in?CI:CO;for(let k=0;k<2;k++)for(const b of B){const cx=clamp(P.x,b.x1,b.x2),cz2=clamp(P.z,b.z1,b.z2),ex=P.x-cx,ez=P.z-cz2,d2=ex*ex+ez*ez;if(d2<.1225){if(d2>1e-6){const d=Math.sqrt(d2),q=(.35-d)/d;P.x+=ex*q;P.z+=ez*q}else P.x=b.x1-.35}}
 if(S.in==2){P.x=clamp(P.x,-4.6,4.6);P.z=clamp(P.z,-403.5,-396.6)}else if(S.in){P.x=clamp(P.x,-3.3,3.3);P.z=clamp(P.z,-302.6,-297.5)}
@@ -917,7 +917,7 @@ pl.position.copy(P);pl.visible=true;pl.rotation.y=pl.rotation.y;
 const dist=S.in?2.4:5.2,ph2=pitch;let sc=1,cx,cy,cz;
 for(let k=0;k<6;k++){cx=P.x-Math.sin(yaw)*Math.cos(ph2)*dist*sc;cz=P.z-Math.cos(yaw)*Math.cos(ph2)*dist*sc;cy=1.6+Math.sin(ph2)*dist*sc+.3;if(S.in||!CO.some(b=>cx>b.x1&&cx<b.x2&&cz>b.z1&&cz<b.z2&&cy<b.h))break;sc-=.17}
 if(S.in==2){cx=clamp(cx,-4.7,4.7);cz=clamp(cz,-403.7,-396.3);cy=Math.min(cy,2.8)}else if(S.in){cx=clamp(cx,-3.4,3.4);cz=clamp(cz,-302.7,-297.3);cy=Math.min(cy,2.5)}
-if(!window.CP||window.CPi!=S.in||Math.hypot(CP.x-cx,CP.z-cz)>20)window.CP=new THREE.Vector3(cx,cy,cz);window.CPi=S.in;const kk=1-Math.exp(-dt*14);CP.x+=(cx-CP.x)*kk;CP.y+=(cy-CP.y)*kk;CP.z+=(cz-CP.z)*kk;cam.position.set(CP.x,Math.max(.4,CP.y),CP.z);cam.lookAt(P.x,1.4,P.z);cam.rotateZ(Math.sin(t*.9)*.06*FXI+Math.sin(t*35)*.004*CDI);
+if(!window.CP||window.CPi!=S.in||Math.hypot(CP.x-cx,CP.z-cz)>20)window.CP=new THREE.Vector3(cx,cy,cz);window.CPi=S.in;const kk=1-Math.exp(-dt*14);CP.x+=(cx-CP.x)*kk;CP.y+=(cy-CP.y)*kk;CP.z+=(cz-CP.z)*kk;cam.position.set(CP.x,Math.max(.4,CP.y),CP.z);cam.lookAt(P.x,1.4,P.z);cam.rotateZ(Math.sin(t*.9)*.06*FXI+Math.sin(t*35)*.004*(CDI+(window.TRM||0)));
 /* NPC и маркеры */
 kira.visible=S.step==3||S.step==6||S.step==11||S.step==12||S.step==13||S.step==18||S.step==22||(S.step==24&&!S.f.timur)||(S.step==20&&hh()>=17&&hh()<23)||(S.step==9&&S.f.route!='bad');kira.rotation.z=Math.sin(t*1.1)*.012;artem.visible=!S.in&&true;if(kira.visible)kira.rotation.y=Math.atan2(P.x-kira.position.x,P.z-kira.position.z);artem.rotation.y=Math.atan2(P.x-artem.position.x,P.z-artem.position.z)*(Math.hypot(P.x-artem.position.x,P.z-artem.position.z)<25?1:0)+(Math.hypot(P.x-artem.position.x,P.z-artem.position.z)<25?0:Math.PI);
 const tg=tgt();beacon.visible=!!tg&&!busy;if(tg)beacon.position.set(tg[0],20,tg[1]);
@@ -954,7 +954,7 @@ PP.cp=new THREE.ShaderMaterial({uniforms:{tx:{value:null}},vertexShader:vs,depth
 PP.q=new THREE.Mesh(new THREE.PlaneGeometry(2,2),PP.m);PP.q.frustumCulled=false;PP.sc.add(PP.q);PP.on=true}catch(e){PP.on=false;console.warn('post',e)}
 function ppResize(){if(!PP.on)return;const s=R.getDrawingBufferSize(new THREE.Vector2());[PP.a,PP.h0,PP.h1].forEach(r=>r.setSize(s.x,s.y));PP.m.uniforms.asp.value=s.x/s.y}
 function draw(t,dt){FXI+=((S.fx>0?1:0)-FXI)*Math.min(1,dt*(S.fx>0?.5:.3));CDI+=((S.cd>0?1:0)-CDI)*Math.min(1,dt*.5);
-if(PP.on&&(FXI>.01||CDI>.01||QK!='low')){try{const u=PP.m.uniforms;u.t.value=t;u.fx.value=FXI;u.cd.value=CDI;
+if(PP.on&&(FXI>.01||CDI>.01||(QK=='high'&&!MOB))){try{const u=PP.m.uniforms;u.t.value=t;u.fx.value=FXI;u.cd.value=CDI;
 R.setRenderTarget(PP.a);R.render(scene,cam);u.tx.value=PP.a.texture;u.hist.value=PP.h0.texture;PP.q.material=PP.m;R.setRenderTarget(PP.h1);R.render(PP.sc,PP.cam);
 PP.cp.uniforms.tx.value=PP.h1.texture;PP.q.material=PP.cp;R.setRenderTarget(null);R.render(PP.sc,PP.cam);const x=PP.h0;PP.h0=PP.h1;PP.h1=x;if(!PP.chk){PP.chk=1;try{const pr=R.properties.get(PP.m).currentProgram,g=R.getContext();if(pr&&!g.getProgramParameter(pr.program,g.LINK_STATUS)){PP.on=false;console.warn('PP shader failed')}}catch(e){}}return}catch(e){PP.on=false;R.setRenderTarget(null)}}
 R.render(scene,cam)}
@@ -964,7 +964,7 @@ function resize(){R.setSize(innerWidth,innerHeight,false);ppResize();cam.aspect=
 addEventListener('resize',resize);resize();
 /* ===== старт ===== */
 pl.position.copy(P);if(S.in)S.in=1;
-function begin(fresh){if(fresh){localStorage.removeItem(K);S=def();P.set(S.x,0,S.z);yaw=0}$('start').hidden=true;started=true;paused=false;audio();
+function begin(fresh){if(fresh){try{localStorage.setItem(K+'_old',localStorage.getItem(K)||'')}catch(e){}localStorage.removeItem(K);S=def();P.set(S.x,0,S.z);yaw=0}$('start').hidden=true;started=true;paused=false;audio();
 if(!S.msgs.length){msg('Мама','Деньги на тумбочке. Мы на смене до ночи.',1);msg('Кира','Ты живой? Давай увидимся сегодня.',1);$('bP').classList.add('dot')}
 fixPos();if(!S.f.intro){S.f.intro=1;S.in=1;P.set(0,0,-300);yaw=0;run(()=>ask('','Сургут. Ноябрь. За окном ещё темно, в квартире тихо. Родители давно ушли. Телефон мигает на тумбочке. Входная дверь — справа впереди.'))}}
 function fixPos(){if(S.in){if(!(P.x>-3.4&&P.x<3.4&&P.z>-303&&P.z<-296.9)){P.set(0,0,-300);yaw=0}}else if(P.z<-250){P.set(-30,0,-1.2);yaw=0}}
@@ -977,5 +977,113 @@ function safeSave(){try{if(started)save()}catch(e){}}
 addEventListener('pagehide',safeSave);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)safeSave()});
 setInterval(safeSave,15000);
+/* ===== ВЕРСИЯ 2.0: слой механик ===== */
+(()=>{
+const pick=a=>a[Math.floor(Math.random()*a.length)],rnd=Math.random;
+const C=(k,d,lo=0,hi=100)=>{S[k]=clamp((S[k]||0)+d,lo,hi)};
+let pMin=S.min,pF=0,tk=0;
+window.TRM=0;window.WD=0;
+window.workMul=()=>{let m=1;if(S.str>70)m-=.15;if(S.sat<20)m-=.1;if(S.aw>20)m-=.15;if(WD>.3)m-=.2;if(S.hp<40)m-=.1;if(S.fx>0)m-=.1;if(S.add<15&&S.str<40&&S.aw<14)m+=.1;return clamp(m,.5,1.15)};
+/* --- события --- */
+async function panic(){sfx('heart',.4);const c=await ask('','Сердце колотится, воздух не проходит в грудь. Руки онемели. Это паническая атака.',['Присесть и дышать медленно.','Написать Кире.','Терпеть и идти дальше.']);
+if(c==0){S.min+=20;chg({str:-18,en:-3});toast('Отпустило. Медленный выдох помогает.')}else if(c==1){chg({str:-12,love:2,trust:2});msg('Кира','Я рядом. Дыши со мной: вдох на четыре, выдох на шесть.')}else{S.hp=clamp(S.hp-5,0,100);chg({str:-4,self:-2});toast('Дотерпел. Телу это не понравилось.')}}
+async function micro(){await fade('Ты проваливаешься в сон на ходу…',()=>{S.min+=90;S.hp=clamp(S.hp-(S.in?3:10),0,100);chg({en:10,str:4});S.aw=Math.max(0,S.aw-3)});await ask('',S.in?'Очнулся на полу. Затёкла шея. Организм вырубил тебя сам.':'Ты очнулся на лавке, весь в инее. Больше нельзя так не спать.')}
+async function collapse(){S.f.col=(S.f.col||0)+1;await fade('Темнота…',()=>{S.fx=0;S.cd=0;S.in=1;P.set(1.2,0,-299.6);yaw=0;S.min+=600;S.hp=40;S.sat=Math.max(S.sat,35);S.en=45;S.money-=Math.min(S.money,400);chg({trust:-10,self:-8,str:10})});
+await ask('','Белый потолок, чужой голос: «Живой. Соседи нашли». Ты дома. Лекарства и такси ушли из твоих денег, а телу напоминание: оно не железное.');msg('Кира','Мне позвонили. Я приехала, ты спал. Нам надо серьёзно поговорить.');msg('Мама','Сынок, мы всё знаем. Приходи на кухню.');
+if(S.f.col>=3){S.f.dark=1;await ask('','Третий раз. Врач говорит без обиняков: следующего может не быть. Ты слушаешь и впервые не споришь.')}}
+async function momFinds(){const c=await ask('Мама','Вадик, я нашла у тебя в куртке пакетик. Что это?',['Признаться: «Мне плохо, помоги».','Соврать: «Это не моё».','Накричать и уйти.']);
+if(c==0){S.f.momKnows=1;S.f.conf=1;chg({self:6,str:-10,trust:3});S.inv.kit++;await ask('Мама','Она долго молчит, потом обнимает. «Справимся. Я записала нас к врачу». На столе лежит аптечка.')}
+else if(c==1){S.f.lies=(S.f.lies||0)+1;chg({self:-6,str:8});await ask('Мама','«Ладно». Она не верит, но кивает. Ложь теперь лежит между вами третьим человеком.')}
+else{S.f.momKnows=1;chg({str:10,trust:-6,self:-8});msg('Мама','Я не буду кричать. Я просто жду тебя дома.')}}
+async function raid(){await fade('Стук в дверь. Громкий…',()=>{S.in=1;P.set(1.2,0,-299.6);yaw=0;S.min+=240});await ask('Полиция','Проверка по заявлению. Открывайте.');
+const m=Math.min(S.money,2000);S.money-=m;S.f.heat=0;S.f.raided=1;chg({rep:-10,str:15,self:-6});if(!S.f.momKnows){S.f.momKnows=1;chg({trust:-8})}
+await ask('','Обыск, протокол, штраф '+m+' ₽. Родители стоят в коридоре и смотрят на тебя. Кто-то сдал тебя.');if(S.f.betrayed)msg('Артём','Ничего личного. У меня тоже есть начальство.')}
+async function beating(){await fade('Тебя ждут у подъезда…',()=>{S.hp=clamp(S.hp-25,0,100);S.money-=Math.min(S.money,800);S.min+=60;chg({rep:-5,str:15,self:-6})});await ask('Незнакомец','Долг растёт каждый день. Это пока просто разговор.')}
+async function evCar(){const c=await ask('Дядя Миша','Парень, подтолкни! Колёса в снегу.',['Помочь.','Пройти мимо.']);if(c==0){S.min+=15;S.money+=100;chg({en:-8,rep:3,self:2});sfx('coin');toast('+100 ₽ и «спасибо»')}else chg({rep:-1,self:-2})}
+async function evFound(){S.money+=150;sfx('coin');await ask('','В сугробе у остановки торчит край купюры. Сто пятьдесят рублей. Кому-то сегодня не повезло, тебе повезло.')}
+async function evPatrol(){await ask('Патруль','Стоять. Документы. Карманы покажем?');
+const c=await ask('','Взгляд скользит по твоим зрачкам и рукам.',['Спокойно показать документы.','Ускорить шаг.']);
+if(c==0){if(rnd()<.55){S.f.heat=(S.f.heat||0)+1;chg({str:8});await ask('Патруль','Свободен. Идёшь странно, ты в курсе?')}else{const m=Math.min(S.money,1500);S.money-=m;chg({rep:-6,str:12});await ask('Патруль','Протокол и штраф '+m+' ₽.')}}
+else{if(rnd()<.4){S.hp=clamp(S.hp-5,0,100);chg({str:15});toast('Ушёл дворами. Сердце вот-вот выпрыгнет.')}else{await fade('Задержание…',()=>{S.min+=600;S.money-=Math.min(S.money,1500);chg({rep:-8,str:18,self:-8})});msg('Мама','Нам звонили из отдела. Что происходит?')}}}
+async function evSerg(){let c=2;while(c==2){c=await ask('Серый','Вадь! Есть тема на ночь: отнести пакет. Полторы тысячи, без вопросов.',['Согласиться.','Отказаться.','Спросить, что внутри.']);if(c==2)await ask('Серый','Не спрашивай, не соврёшь. Да или нет?')}
+if(c==0){S.money+=1500;S.f.serg=(S.f.serg||0)+1;S.f.heat=(S.f.heat||0)+1;chg({rep:-6,self:-6,str:10});sfx('coin');await ask('','Пакет отнесён. Деньги в кармане. Внутри всё сжалось от понимания, что назад это не отыграть.')}
+else{S.f.sergRef=(S.f.sergRef||0)+1;chg({self:3,rep:1});await ask('Серый',S.f.sergRef>1?'Понял. Больше не позвоню.':'Ну как знаешь. Я ещё наберу.')}}
+const EV=[[()=>1,evCar],[()=>1,evFound],[()=>S.fx>0||S.cd>0||S.f.serg||S.f.courier||(S.f.debt>0),evPatrol],[()=>S.step>=5&&S.money<700&&S.f.sergRef!==2&&(S.f.serg||0)<3?2:0,evSerg]];
+function dayTick(){const f=S.f;
+if(S.step>=5&&S.add>=30){chg({trust:-2,love:-1});if(rnd()<.6)msg('Кира',pick(['Ты опять пропал. Я не злюсь. Я боюсь.','Ты звонил ночью и молчал. Что происходит?','Мама спросила, почему у тебя глаза такие. Я соврала.']))}
+if(f.nina&&!f.soup&&rnd()<.5){f.soup=1;S.inv.food++;msg('Баба Нина','Вадик, поставила тебе пирожков у двери. Ешь, совсем тощий.')}
+if(f.debt>0){f.debt+=Math.round(f.debt*.05);f.dd=(f.dd||0)+1;if(f.dd==3)msg('Артём','Срок поджимает, друг. Долг '+f.debt+' ₽.');if(f.dd==6)msg('Незнакомец','Тебя ищут. Лучше сам.');if(f.dd>=8){f.dd=0;run(beating)}
+if(f.courier&&!f.betrayed&&Math.floor(S.min/1440)>=8&&rnd()<.35){f.betrayed=1;f.heat=(f.heat||0)+2}}
+if((f.heat||0)>=3&&rnd()<.6)run(raid);
+if(S.add>=35&&!f.momKnows&&rnd()<.3)run(momFinds);
+if((f.lies||0)>=3&&!f.momKnows){f.momKnows=1;chg({trust:-12,self:-10});msg('Мама','Я проверила. Всё, что ты говорил, было неправдой. Больше я не буду спрашивать. Я буду ждать.')}
+if(!f.clean7&&f.acc&&S.lu>0&&S.add<20&&(S.min-S.lu)/60>168){f.clean7=1;chg({self:10,trust:8,love:4});msg('Кира','Семь дней. Я посчитала. Горжусь тобой. Приходи, я принесла тебе кое-что.');toast('Семь дней без употребления')}
+S.hp=clamp(S.hp,0,100)}
+async function jumped(){if(S.fx<=0){S.aw=0;S.hp=clamp(S.hp+(S.sat>25?(S.add>40?6:12):4),0,100);S.tol=clamp(S.tol-3,0,100)}}
+/* --- тик --- */
+function v2(dt){if(!started||paused||busy||S.step<1){TRM=0;return}
+const jump=S.min-pMin;pMin=S.min;if(jump>200)jumped();
+const dm=dt*(S.fx>0?2:.6);
+if(S.fx>0&&!pF){pF=1;S.lu=S.min}else if(S.fx<=0&&pF){pF=0;C('hp',-4);S.aw+=2;C('tol',2)}
+const since=(S.min-(S.lu||-9999))/60;let w=0;
+if(S.add>=20&&S.fx<=0&&S.cd<=0&&S.f.acc)w=clamp((S.add-15)/70,0,1)*clamp((since-3)/9,0,1)*(since>96?clamp(1-(since-96)/120,.2,1):1);
+WD=w;
+if(w>0){C('str',w*.07*dm);C('en',-w*.045*dm);C('sat',-w*.03*dm);if(S.add>55)C('hp',-w*.012*dm);if(w>.3&&S.min%1440>(S.wt||0)+0&&S.min>(S.wm||0)){S.wm=S.min+720;toast('Ломит суставы, знобит. Тело требует своё.')}}
+if(S.fx<=0&&since>24&&S.sat>25){C('add',-.0045*dm);C('tol',-.003*dm)}
+if(S.sat<20){C('en',-.03*dm);C('str',.03*dm)}if(S.sat<6)C('hp',-.05*dm);
+if(S.str>70)C('en',-.025*dm);
+if(S.str>90&&S.min>(S.pv||0)){S.pv=S.min+240;run(panic)}
+if(S.sat>50&&S.str<60&&S.add<40&&S.hp<100)C('hp',.012*dm);
+S.aw=(S.aw||0)+dm/60;if(S.aw>16){C('str',.02*dm);C('en',-.02*dm)}
+if(S.aw>30&&S.min>(S.pm||0)){S.pm=S.min+360;run(micro)}
+if(S.hp<=0){S.hp=1;run(collapse)}
+TRM=clamp(w*1.6+(S.str>75?.6:0)+(S.sat<8?.4:0),0,2);
+const d=Math.floor(S.min/1440);if(S.dd==null)S.dd=d;if(d>S.dd){S.dd=d;dayTick()}
+if(!S.in&&S.step>=2&&S.min>(S.evT||0)){const h=(S.min%1440)/60;if(h>8&&h<23){S.evT=S.min+180+rnd()*240;const L=EV.map(e=>[e[1],e[0]()]).filter(e=>e[1]>0);if(L.length&&rnd()<.7)run(pick(L)[0])}}
+tk+=dt;if(tk>.3){tk=0;$('b4').style.width=S.hp+'%';const p=[];if(S.sat<20)p.push('Голод');if(S.str>75)p.push('Паника');if(w>.2)p.push('Ломка');if(S.aw>16)p.push('Недосып');if(S.fx>0)p.push('Под действием');else if(S.cd>0)p.push('Отходняк');if(S.hp<30)p.push('Плохо');if(S.f.debt>0)p.push('Долг');$('v2s').textContent=p.join(' · ')}}
+const _ex=extraTick;extraTick=function(dt,t){_ex(dt,t);try{v2(dt)}catch(e){console.warn('v2',e)}};
+/* --- рюкзак и заказы --- */
+const SH=[['food','Доставка еды',280,'Сытость +45'],['kit','Аптечка',350,'Здоровье +30, стресс −5'],['tea','Термос чая',120,'Стресс −8, силы +5']];
+window.v2Render=()=>{const i=S.inv;$('v2c').innerHTML='<b>Рюкзак и заказы</b>'+`<div class="hint">Здоровье ${Math.round(S.hp)} · Толерантность ${Math.round(S.tol)} · Без сна ${Math.round(S.aw)} ч · Долг ${S.f.debt||0} ₽${S.f.clean7?' · Фишка: 7 дней':''}</div>`+
+SH.map(s=>`<button data-o="${s[0]}">Заказать: ${s[1]} — ${s[2]} ₽ <small>(${s[3]})</small></button>`).join('')+'<div class="hint">Что о тебе помнят:</div>'+mem().map(x=>`<div class="hint">• ${x}</div>`).join('')+'<div class="hint">Есть:</div>'+
+`<button data-u="food">Съесть еду (${i.food||0})</button><button data-u="kit">Аптечка (${i.kit||0})</button><button data-u="tea">Чай (${i.tea||0})</button><button id="v2x">Назад</button>`};
+$('v2c').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.id=='v2x'){$('v2p').hidden=true;return}
+const o=b.dataset.o,u=b.dataset.u;if(o){const s=SH.find(x=>x[0]==o);if(S.money<s[2]){toast('Не хватает денег');return}S.money-=s[2];S.inv[o]=(S.inv[o]||0)+1;sfx('coin')}
+if(u){if(!(S.inv[u]>0)){toast('Нет в рюкзаке');return}S.inv[u]--;if(u=='food')C('sat',45);if(u=='kit'){C('hp',30);C('str',-5)}if(u=='tea'){C('str',-8);C('en',5)}sfx('warm')}
+v2Render();save()};
+$('v2b').onclick=()=>{v2Render();$('v2p').hidden=false};
+
+/* --- память персонажей и концовки --- */
+function mem(){const f=S.f,a=[];
+if(f.gave)a.push('Кира: «Ты отдал мне последнее, когда я просила. Я помню».');if(f.flowers)a.push('Кира: хранит три тюльпана, засохшие в книге.');
+if(S.trust<35)a.push('Кира: верит тебе всё меньше, но ещё отвечает.');else if(S.trust>=65)a.push('Кира: знает, что на тебя можно опереться.');
+if(f.conf)a.push('Мама: ты сказал правду, и она села рядом.');if((f.lies||0)>0)a.push('Мама: ты лгал ей '+f.lies+' раз(а). Она считает.');
+if(f.nina)a.push('Баба Нина: тот, кто поднял ей сумки.');if(f.soup)a.push('Баба Нина: оставляет тебе пирожки у двери.');
+if(f.uses)a.push('Артём: «свой человек». Он знает, где ты живёшь.');if(f.betrayed)a.push('Артём: сдал тебя, когда стало невыгодно.');
+if(f.serg)a.push('Серый: считает тебя «надёжным курьером».');if(f.sergRef)a.push('Серый: ты отказывал ему ('+f.sergRef+').');
+if(f.col)a.push('Тело: '+f.col+' раз ты падал без сознания.');if(f.clean7)a.push('Кира: отсчитала твои первые семь дней.');
+return a.length?a:['Пока о тебе ничего не помнят. Всё впереди.']}
+const END={
+dom:['Дом','Секретная концовка','Кухня. Мама, Кира, баба Нина с пирожками. Никто не говорит о прошлом громко. Ты впервые за год ешь вместе с людьми, которые знают о тебе всё и остались.'],
+rean:['Реанимация','Тело сказало последнее слово','Ты выжил, и врач сказал это без радости. Дальше два пути: больничная койка или первые честные шаги. Выбор снова за тобой, но он стал дороже.'],
+pris:['Приговор','Последствия догнали','Повестка, суд, чужие лица в коридоре. Кто-то из тех, кому ты доверял, давно решил за тебя. Ты думаешь о Кире. Она пишет: «Я буду ждать письма».'],
+tish:['Тишина','Всё вокруг выжжено','Телефон молчит. Люди ушли один за другим, и в этом нет ни злобы, ни драмы. Дверь не закрыта, ты это знаешь. Это самое тяжёлое.'],
+clean:['Чистый лист','Хорошая концовка','Ты прошёл через ломку, срывы и долги и не сдался. Тебе по-прежнему тяжело, но теперь это тяжесть живого человека.'],
+spr:['Весна','Хорошая концовка','Вы дожили до оттепели. Не всё исправлено, но двери открыты, и ты в них.'],
+scar:['Шрамы','Открытая концовка','Ничего не решено окончательно. Есть работа, есть Кира на лавочке и четверги в центре. И каждый день выбор.']};
+function endKey(){const f=S.f,dark=f.dark||S.add>=55||S.self<25,good=!dark&&S.love>=55&&S.trust>=50&&S.self>=55&&S.add<25;
+if(good&&f.clean7&&f.conf&&f.nina)return'dom';if((f.col||0)>=3)return'rean';if((f.heat>=3||f.raided)&&dark)return'pris';if(dark)return'tish';if(good&&f.clean7)return'clean';if(good)return'spr';return'scar'}
+window.v2Ending=()=>new Promise(res=>{const k=endKey(),e=END[k];let got={};try{got=JSON.parse(localStorage.getItem('tn_ends')||'{}')}catch(x){}got[k]=1;try{localStorage.setItem('tn_ends',JSON.stringify(got))}catch(x){}
+S.f.endKey=k;const L=[e[2],...mem().slice(0,6),`Привязанность ${Math.round(S.love)} · Самоуважение ${Math.round(S.self)} · Доверие ${Math.round(S.trust)} · Зависимость ${Math.round(S.add)}`,`Концовок открыто: ${Object.keys(got).length} из 7`];
+$('v2et').textContent=e[0];$('v2es').textContent=e[1];$('v2el').innerHTML=L.map((x,i)=>`<p style="animation-delay:${1.2+i*.9}s">${x}</p>`).join('');$('v2e').hidden=false;sfx('warm');
+$('v2eb').onclick=()=>{$('v2e').hidden=true;save();res()}});
+/* --- авто-качество --- */
+let ga=0,gn=0,gl=performance.now(),gh=0;
+(function g(){requestAnimationFrame(g);const n=performance.now(),d=n-gl;gl=n;if(!started||paused||document.hidden||d>250){ga=0;gn=0;return}
+if(gh>0){gh-=d;return}ga+=d;gn++;if(ga>4000){const avg=ga/gn;ga=0;gn=0;
+if(avg>27&&QK!='low'&&!localStorage.getItem('tn_qm')){QK=QK=='high'?'medium':'low';QS=QL[QK];localStorage.setItem('tn_q',QK);applyQ();gh=3000;toast('Графика снижена для плавности: '+QS.n)}}})();
+S.inv=Object.assign({food:0,kit:0,tea:0},S.inv);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)try{save()}catch(e){}});
+})();
 </script>
 </body></html>
