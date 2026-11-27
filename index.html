@@ -32,7 +32,7 @@ button:active{background:#2a313b}
 .msg{border-bottom:1px solid #ffffff12;padding-bottom:6px}.msg b{color:var(--acc)}.msg small{color:var(--dim);float:right}
 .st{display:grid;grid-template-columns:110px 1fr;gap:6px;align-items:center;font-size:13px;color:var(--dim)}
 .st i{height:5px;background:#ffffff1c;border-radius:3px;overflow:hidden}.st b{display:block;height:100%;background:var(--acc)}
-#start{background:radial-gradient(ellipse at 50% 70%,#2a2a33,#05070b)}
+#start{background:linear-gradient(#05070bd0,#05070b40 45%,#05070be0)}#dlg{z-index:3}.cb{position:fixed;left:0;right:0;background:#000;height:0;transition:height .6s;z-index:2;pointer-events:none}
 #start h1{font:700 clamp(34px,9vw,64px)/1 Georgia,serif;letter-spacing:.02em;margin:0}
 #start p{color:var(--dim);margin:0;max-width:46ch}
 #fade{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity .7s;display:flex;align-items:center;justify-content:center;font:italic 20px Georgia,serif;z-index:4;text-align:center;padding:20px}
@@ -687,6 +687,34 @@ async function kiraFree(){await ask('Кира',KL[Math.floor(Math.random()*KL.le
 IA.unshift({in:0,x:-92,z:82,r:2.8,l:()=>'Поговорить с Тимуром',ok:()=>S.step==21,fn:talkTimur},
 {in:0,x:-20,z:4.4,r:2.6,l:()=>'Подойти к Кире',ok:()=>S.step==22,fn:talkKira6},
 {in:0,x:-20,z:4.4,r:2.6,l:()=>'Посидеть с Кирой',ok:()=>S.step==20&&hh()>=17&&hh()<23&&S.f.kD!==dayN(),fn:kiraFree});
+/* ===== кино: небо, лучи фонарей, пар, заставка, эпилог ===== */
+let DZ=0;
+const sky=new THREE.Mesh(new THREE.SphereGeometry(195,24,12),new THREE.ShaderMaterial({uniforms:{hor:{value:new THREE.Color()},top:{value:new THREE.Color()}},vertexShader:'varying float y;void main(){y=normalize(position).y;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'uniform vec3 hor,top;varying float y;void main(){gl_FragColor=vec4(mix(hor,top,pow(clamp(y,0.,1.),.55)),1.);}',side:THREE.BackSide,depthWrite:false,fog:false}));sky.renderOrder=-1;sky.frustumCulled=false;scene.add(sky);
+const cm=new THREE.MeshBasicMaterial({color:0xffcf8a,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,fog:false});
+for(let x=-100;x<=100;x+=25){const c=new THREE.Mesh(new THREE.CylinderGeometry(.15,3.4,7,14,1,true),cm);c.position.set(x,3.5,37.8);scene.add(c)}
+const BR=[];for(let i=0;i<6;i++){const q=new THREE.Sprite(new THREE.SpriteMaterial({map:dotT,transparent:true,opacity:0,depthWrite:false,fog:false}));scene.add(q);BR.push({q,l:9})}
+const tb=document.createElement('div'),bb=document.createElement('div');tb.className=bb.className='cb';tb.style.top=0;bb.style.bottom=0;document.body.append(tb,bb);
+let bt=0,l3=performance.now();(function f(){requestAnimationFrame(f);const n=performance.now(),dt=Math.min(.05,(n-l3)/1000);l3=n;
+const h=hh(),f2=clamp(1-Math.abs(h-13)/5.5,0,1),hc=fog.color;sky.position.copy(cam.position);sky.material.uniforms.hor.value.copy(hc);sky.material.uniforms.top.value.setRGB(hc.r*.55,hc.g*.62,hc.b*.8+.03*(1-f2));cm.opacity=S.in?0:.07*(1-f2);
+const op=!$('dlg').hidden;tb.style.height=bb.style.height=op?'7vh':'0';
+if(!started){const a=n/9000;cam.position.set(-30+Math.cos(a)*48,15,14+Math.sin(a)*38);cam.lookAt(-30,7,-6)}
+bt+=dt;if(bt>2.4&&!S.in&&started&&!paused){bt=0;const o=BR.find(b=>b.l>=1);if(o){o.l=0;o.x=P.x+Math.sin(pl.rotation.y)*.28;o.z=P.z+Math.cos(pl.rotation.y)*.28}}
+BR.forEach(o=>{if(o.l<1){o.l+=dt*.8;o.q.position.set(o.x+Math.sin(pl.rotation.y)*o.l*.5,1.62+o.l*.35,o.z+Math.cos(pl.rotation.y)*o.l*.5);o.q.scale.setScalar(.15+o.l*.7);o.q.material.opacity=(1-o.l)*.35}else o.q.material.opacity=0})})();
+async function spring(){S.f.ep=1;
+await fade('Прошло три месяца…',()=>{S.min+=1440*92;S.in=1;P.set(1.2,0,-299.6)});
+const dark=S.f.dark||S.add>=55||S.self<25,good=!dark&&S.love>=55&&S.trust>=50&&S.self>=55&&S.add<25;
+await ask('','Конец февраля. Снег во дворе серый, осевший, с чёрными проталинами. Окно в квартире впервые за зиму открыто, и в комнату тянет мокрой землёй.');
+if(good){await ask('Кира','(сообщение) Я у остановки. Принесла пирог от бабушки. Не опаздывай. Мы же договорились: по-настоящему.');
+await ask('','Вы идёте по двору. Всё то же: панельки, гаражи, лавочка. Но ты впервые видишь, что это просто дома.');
+await ask('Кира','Я так боялась, что мы не доживём до весны. А мы дожили.')}
+else if(dark){await ask('','Телефон лежит экраном вниз. Ты давно не смотришь, кто звонит. Двор за окном тот же, только ты в нём другой.');
+await ask('','Кира написала «береги себя» и больше не писала. Ты можешь ответить. Каждый день знаешь, что можешь.');
+await ask('','И каждый день решаешь заново. Выход никогда не закрывается совсем. Это и есть самое трудное.')}
+else{await ask('','Всё не исправилось, но и не рухнуло. Ты ходишь в центр по четвергам, работаешь, иногда молчишь рядом с Кирой на лавочке.');
+await ask('Кира','Не знаю, что у нас будет. Но я хочу узнать. Если ты тоже.')}
+await ask('Итог',`Привязанность ${Math.round(S.love)} · Самоуважение ${Math.round(S.self)} · Доверие ${Math.round(S.trust)} · Зависимость ${Math.round(S.add)}`);
+await ask('','«Точка невозврата». Эпилог. Спасибо, что дошёл до конца. Игра продолжается в свободном режиме.')}
+IA.unshift({in:1,x:0,z:-297.7,r:2,l:()=>'Календарь: дожить до весны (эпилог)',ok:()=>S.step==20&&!S.f.ep,fn:spring});
 /* ===== люди: оживление, одежда, прохожие, небо ===== */
 winter(artem,0x4a4a3a,0x333333,0x1c1c1c);winter(MAX,0x7a2a2a,0xdddddd,0x2a2a2a);winter(TIM,0x15151a,0x555555,0x15151a);
 const NPC=[artem,MAX,TIM,kira];function idle(g,t){const u=g.userData;if(!u.A)return;const k=g.id%7;g.scale.y=1+Math.sin(t*1.7+k)*.007;u.A[0].rotation.x=Math.sin(t*1.1+k)*.05;u.A[1].rotation.x=-Math.sin(t*1.1+k)*.05}
@@ -809,7 +837,7 @@ const sp=wt=='rain'?15:2.2;for(let i=0;i<QN;i++){const k=i*3;pp[k+1]-=(sp+(i%5)*
 if(pp[k]-P.x>30)pp[k]-=60;else if(pp[k]-P.x<-30)pp[k]+=60;if(pp[k+2]-P.z>30)pp[k+2]-=60;else if(pp[k+2]-P.z<-30)pp[k+2]+=60}pg.attributes.position.needsUpdate=true;pts.visible=!S.in;
 sfxEnv(t,wt,f);
 cvs.style.filter='none';
-cam.fov=60+Math.sin(t*1.3)*7*fx;cam.updateProjectionMatrix()}
+DZ+=((!$('dlg').hidden?9:0)-DZ)*.05;cam.fov=60-DZ+Math.sin(t*1.3)*7*fx;cam.updateProjectionMatrix()}
 function update(dt,t){heroTick(dt);NPCM.forEach(x=>x.update(dt));NPC.forEach(g=>idle(g,t));extraTick(dt,t);
 if(!busy){const kx=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0),ky=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0);
 let ix=kx+jx,iy=ky+jy;const l=Math.hypot(ix,iy);if(l>1){ix/=l;iy/=l}
@@ -858,17 +886,20 @@ float l=dot(col,vec3(.299,.587,.114));col=mix(vec3(l),col,1.+fx*.9-cd*.95);
 col*=1.-cd*.12;
 float vg=smoothstep(.85,.2,r*(1.+fx*.5+cd*.9));col*=mix(1.,vg,.55*fx+.7*cd);
 col*=1.+.07*sin(t*(2.+5.*fx))*fx;
+vec3 bl=vec3(0.);for(int i=0;i<12;i++){float a=float(i)*.5236;float rr=.012+.018*mod(float(i),2.);bl+=max(texture2D(tx,v+vec2(cos(a)/asp,sin(a))*rr).rgb-.6,0.);}col+=bl/12.*1.7;
+float lm=dot(col,vec3(.333));col*=mix(vec3(.9,.97,1.1),vec3(1.08,1.,.9),smoothstep(.15,.7,lm));col=mix(col,col*col*(3.-2.*col),.35);
+col*=1.-.3*smoothstep(.35,.75,r);col+=(fract(sin(dot(v*vec2(1731.,947.)+t,vec2(12.9898,78.233)))*43758.5453)-.5)*.03;
 gl_FragColor=vec4(col,1.);}`});
 PP.cp=new THREE.ShaderMaterial({uniforms:{tx:{value:null}},vertexShader:vs,depthTest:false,depthWrite:false,fragmentShader:'uniform sampler2D tx;varying vec2 v;void main(){gl_FragColor=texture2D(tx,v);}'});
 PP.q=new THREE.Mesh(new THREE.PlaneGeometry(2,2),PP.m);PP.q.frustumCulled=false;PP.sc.add(PP.q);PP.on=true}catch(e){PP.on=false;console.warn('post',e)}
 function ppResize(){if(!PP.on)return;const s=R.getDrawingBufferSize(new THREE.Vector2());[PP.a,PP.h0,PP.h1].forEach(r=>r.setSize(s.x,s.y));PP.m.uniforms.asp.value=s.x/s.y}
 function draw(t,dt){FXI+=((S.fx>0?1:0)-FXI)*Math.min(1,dt*(S.fx>0?.5:.3));CDI+=((S.cd>0?1:0)-CDI)*Math.min(1,dt*.5);
-if(PP.on&&(FXI>.01||CDI>.01)){try{const u=PP.m.uniforms;u.t.value=t;u.fx.value=FXI;u.cd.value=CDI;
+if(PP.on&&(FXI>.01||CDI>.01||QK!='low')){try{const u=PP.m.uniforms;u.t.value=t;u.fx.value=FXI;u.cd.value=CDI;
 R.setRenderTarget(PP.a);R.render(scene,cam);u.tx.value=PP.a.texture;u.hist.value=PP.h0.texture;PP.q.material=PP.m;R.setRenderTarget(PP.h1);R.render(PP.sc,PP.cam);
 PP.cp.uniforms.tx.value=PP.h1.texture;PP.q.material=PP.cp;R.setRenderTarget(null);R.render(PP.sc,PP.cam);const x=PP.h0;PP.h0=PP.h1;PP.h1=x;return}catch(e){PP.on=false;R.setRenderTarget(null)}}
 R.render(scene,cam)}
 let last=0;
-function loop(ts){requestAnimationFrame(loop);const t=ts/1000,dt=Math.min(.05,t-last);last=t;if(started&&!paused)update(dt,t);else if(started){env(0,t)}draw(t,dt)}
+function loop(ts){requestAnimationFrame(loop);const t=ts/1000,dt=Math.min(.05,t-last);last=t;if(started&&!paused)update(dt,t);else{env(0,t)}draw(t,dt)}
 function resize(){R.setSize(innerWidth,innerHeight,false);ppResize();cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()}
 addEventListener('resize',resize);resize();
 /* ===== старт ===== */
